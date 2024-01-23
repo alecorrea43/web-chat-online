@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TextField, Button, Typography, Container, Grid, Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
-
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -11,7 +14,11 @@ const Register = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('');
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
@@ -32,6 +39,28 @@ const Register = () => {
       setSnackbarOpen(true);
       return;
     }
+
+    if (/\s/.test(username)) {
+      setUsernameError('El nombre de usuario no puede contener espacios en blanco.');
+      return;
+    }
+    if (/\s/.test(email)) {
+      setEmailError('El correo electrónico no puede contener espacios en blanco.');
+      return;
+    }
+   
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError('Por favor, ingrese un correo electrónico válido.');
+      return;
+    }
+    if (/\s/.test(password)) {
+      setPasswordError('La contraseña no puede contener espacios en blanco.');
+      return;
+    }
+    setEmailError('');
+    setUsernameError('');
+    setPasswordError('');
 
     fetch('http://localhost:3001/register', {
       method: 'POST',
@@ -60,13 +89,13 @@ const Register = () => {
         setSnackbarMessage(data.message);
         setSnackbarSeverity('success');
       }
-      setSnackbarOpen(true);
+      setSnackbarOpen(true);  // Mostrar la alerta instantáneamente
     })
     .catch((error) => {
       // Otro manejo de errores en rojo
       setSnackbarMessage(error.message);
       setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+      setSnackbarOpen(true);  // Mostrar la alerta instantáneamente
     });
   };
 
@@ -87,7 +116,12 @@ const Register = () => {
             name="username"
             autoComplete="username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => {
+              setUsername(e.target.value);
+              setUsernameError('');
+            }}
+            error={!!usernameError}
+            helperText={usernameError}
           />
           <TextField
             variant="outlined"
@@ -99,7 +133,12 @@ const Register = () => {
             name="email"
             autoComplete="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setEmailError('');
+            }}
+            error={!!emailError}
+            helperText={emailError}
           />
           <TextField
             variant="outlined"
@@ -108,11 +147,27 @@ const Register = () => {
             fullWidth
             name="password"
             label="Contraseña"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             id="password"
             autoComplete="new-password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {setPassword(e.target.value);
+              setPasswordError('');
+            }}
+            error={!!passwordError}
+            helperText={passwordError}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <Button
             type="button"
