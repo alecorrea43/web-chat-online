@@ -15,7 +15,7 @@
   
   /* Cambio de color al pasar el cursor sobre el componente */
   .miClasePersonalizada .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-    border-bottom: 1px solid #00f; /* Color azul para el hover */
+    border-bottom: 1px solid rgb(64, 151, 202); /* Color azul para el hover */
   }
 
   .miClasePersonalizada .MuiOutlinedInput-input {
@@ -26,11 +26,35 @@
     color: inherit;
   }
   input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 1000px #bcace1 inset;
+    -webkit-box-shadow: 0 0 0 1000px #D8EBF6 inset;
     transition: background-color 5000s ease-in-out 0s;
   }
   
   /* Estilo para el campo de entrada */
   .miClasePersonalizada input {
     background-color: transparent !important; /* Asegura que el fondo sea transparente */
+  }
+
+  .MuiCheckbox-colorPrimary.Mui-checked:focus {
+    outline: 1px solid black !important;
+  }
+  .MuiCheckbox-colorPrimary.Mui-checked {
+    color: black !important;
+  }
+  a {
+    color: blue !important; /* Cambia el color del enlace a azul */
+    text-decoration: none; /* Elimina el subrayado del enlace */
+  }
+  
+  a:hover {
+    color: darkblue !important; /* Cambia el color del enlace al pasar el ratón (hover) */
+  }
+  .cssButton {
+    background-color: black !important; /* Cambia el color de fondo a negro */
+    color: white !important; /* Cambia el color del texto a blanco */
+    border-radius: 0 !important; /* Elimina los bordes redondeados */
+  }
+  
+  .cssButton:hover {
+    background-color: rgb(56, 192, 219) !important; /* Cambia el color de fondo al pasar el ratón (hover) */
   }

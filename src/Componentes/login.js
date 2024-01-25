@@ -34,7 +34,7 @@ const StyledContainer = styled(Box)({
 const StyledFormContainer = styled("div")({
   width: "45%",
   height: "100%",
-  backgroundColor: "#bcace1",
+  backgroundColor: "#D8EBF6",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -207,7 +207,7 @@ const Login = () => {
                 <Checkbox
                   checked={rememberPassword}
                   onChange={() => setRememberPassword(!rememberPassword)}
-                  color="primary"
+                  
                 />
               }
               label="Recordar Contraseña"
@@ -223,7 +223,7 @@ const Login = () => {
             type="button"
             fullWidth
             variant="contained"
-            color="primary"
+            className="cssButton"
             onClick={handleLogin}
           >
             Iniciar Sesión
