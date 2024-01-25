@@ -39,6 +39,10 @@ const Register = () => {
       setSnackbarOpen(true);
       return;
     }
+    if (password.length < 6) {
+      setPasswordError('La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
 
     if (/\s/.test(username)) {
       setUsernameError('El nombre de usuario no puede contener espacios en blanco.');

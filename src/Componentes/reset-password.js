@@ -8,7 +8,10 @@ import {
   Alert,
   Container,
   Box,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -17,6 +20,7 @@ const ResetPassword = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const fetchUserEmail = async () => {
@@ -103,12 +107,24 @@ const ResetPassword = () => {
           <form onSubmit={handleResetPassword} style={{ width: '100%', marginTop: '8px' }}>
             <TextField
               label="Nueva Contraseña"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               margin="normal"
               fullWidth
               required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <Button type="submit" variant="contained" color="primary" style={{ width: '100%'}}>
               Restablecer Contraseña

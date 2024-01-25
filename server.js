@@ -130,7 +130,7 @@ app.post('/forgot-password', async (req, res) => {
   if (!email) {
     return res.status(400).json({ error: 'El campo de correo electrónico es obligatorio.' });
   }
-
+  
   try {
     const user = await getUserByUsernameOrEmail(email);
 
@@ -153,6 +153,36 @@ app.post('/forgot-password', async (req, res) => {
     return res.status(500).json({ error: 'Ha ocurrido un error en el servidor. Por favor, inténtalo de nuevo.' });
   }
 });
+// Ruta para verificar si ya hay una solicitud de recuperación en progreso para el correo electrónico
+app.post('/check-existing-request', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'El campo de correo electrónico es obligatorio.' });
+  }
+
+  try {
+    const existingRequest = await checkExistingRequest(email);
+
+    return res.json({ exists: existingRequest });
+  } catch (err) {
+    console.error('Error en el servidor:', err);
+    return res.status(500).json({ error: 'Ha ocurrido un error en el servidor. Por favor, inténtalo de nuevo.' });
+  }
+});
+
+async function checkExistingRequest(email) {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM recovery_tokens WHERE email = ?';
+    db.get(sql, [email], (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(!!row); // Devuelve true si hay una solicitud existente, de lo contrario, false
+      }
+    });
+  });
+}
 
 
 //ruta para setear el password confirmacion 

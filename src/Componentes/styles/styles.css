@@ -1,0 +1,36 @@
+.miClasePersonalizada .MuiOutlinedInput-root {
+    border: none;
+    border-radius: 0; /* Quita los bordes redondeados */
+  }
+  
+  .miClasePersonalizada .MuiOutlinedInput-notchedOutline {
+    border: none;
+    border-bottom: 1px solid #000; /* Puedes ajustar el color y el grosor según tus preferencias */
+  }
+
+  /* Anula el color del borde cuando está enfocado */
+  .miClasePersonalizada .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-bottom: 1px solid #000; /* Mantén el mismo color y grosor del borde al estar enfocado */
+  }
+  
+  /* Cambio de color al pasar el cursor sobre el componente */
+  .miClasePersonalizada .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-bottom: 1px solid #00f; /* Color azul para el hover */
+  }
+
+  .miClasePersonalizada .MuiOutlinedInput-input {
+    border: none;
+  }
+  
+  .miClasePersonalizada .MuiInputLabel-root.Mui-focused {
+    color: inherit;
+  }
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #bcace1 inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  
+  /* Estilo para el campo de entrada */
+  .miClasePersonalizada input {
+    background-color: transparent !important; /* Asegura que el fondo sea transparente */
+  }

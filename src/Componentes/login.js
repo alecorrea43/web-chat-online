@@ -1,10 +1,12 @@
+// Login.js
+import "./styles/styles.css";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   TextField,
   Button,
   Typography,
-  Container,
+  Box,
   Grid,
   Snackbar,
   Checkbox,
@@ -14,13 +16,64 @@ import {
 import MuiAlert from "@mui/material/Alert";
 import { styled } from "@mui/system";
 
-const StyledContainer = styled(Container)({
-  marginTop: (theme) => theme.spacing(4),
+
+const StyledContainer = styled(Box)({
+  display: "flex",
+  height: "100vh",
+  width: "100%",
+  marginLeft: "auto",
+  marginRight: "auto",
+  boxSizing: "border-box",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: 0, // Ajusta el valor según tus necesidades
+ maxWidth: "100%",
 });
 
-const StyledForm = styled("form")({
-  width: "100%",
-  marginTop: (theme) => theme.spacing(1),
+
+const StyledFormContainer = styled("div")({
+  width: "45%",
+  height: "100%",
+  backgroundColor: "#bcace1",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  
+});
+const StyledFormContainerBox = styled("div")({
+  width: "80%",
+  height:"100%",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+ 
+
+});
+const StyledImageContainer = styled("div")({
+  width: "55%",
+  height: "100%",
+  backgroundImage: `url(${require('./image/white-flowers-7854806_1280.webp')})`,
+  backgroundSize: "cover",
+  backgroundRepeat: "no-repeat", 
+  backgroundPosition: "center",
+});
+const StyledFormItem = styled("div")({
+  marginBottom: "30px",
+  width:"100%" // Ajusta el margen inferior según tus necesidades
+});
+
+const StyledTitle = styled(Typography)({
+  textAlign: "center",
+  marginBottom: "30px",
+});
+
+const StyledTypography = styled(Typography)({
+  textAlign: "center",
+  marginTop: "20px",
+});
+const StyledGrid = styled(Grid)({
+  marginBottom: "20px", // Ajusta el margen inferior según tus necesidades
 });
 
 const Login = () => {
@@ -45,7 +98,7 @@ const Login = () => {
     }
 
     try {
-      setIdentifierError(""); // Restablece el error en caso de que haya tenido éxito anteriormente
+      setIdentifierError("");
 
       const response = await fetch("http://localhost:3001/login", {
         method: "POST",
@@ -64,11 +117,9 @@ const Login = () => {
         throw new Error(data.error || "Error en la solicitud");
       }
 
-      setError(""); // Limpiar cualquier mensaje de error anterior
-
+      setError("");
       console.log("Inicio de sesión exitoso");
 
-      // Almacenar la contraseña solo si la opción de recordar está activada
       if (rememberPassword) {
         localStorage.setItem(`savedPassword_${identifier}`, password);
       }
@@ -94,7 +145,6 @@ const Login = () => {
   };
 
   useEffect(() => {
-    // Leer la contraseña del almacenamiento local cuando el nombre de usuario cambia
     const savedPassword = localStorage.getItem(`savedPassword_${identifier}`);
     if (savedPassword && identifier) {
       setPassword(savedPassword);
@@ -102,13 +152,16 @@ const Login = () => {
   }, [identifier]);
 
   return (
-    <StyledContainer component="main" maxWidth="xs">
-      <div>
-        <Typography component="h1" variant="h5">
+    <StyledContainer component="main" maxWidth="xl">
+      <StyledFormContainer>
+      <StyledFormContainerBox>
+        <StyledTitle component="h1" variant="h5">
           Iniciar Sesión
-        </Typography>
-        <StyledForm noValidate>
+        </StyledTitle>
+        <StyledFormItem> 
           <TextField
+          
+          className="miClasePersonalizada"
             variant="outlined"
             margin="normal"
             required
@@ -120,12 +173,15 @@ const Login = () => {
             value={identifier}
             onChange={(e) => {
               setIdentifier(e.target.value);
-              setIdentifierError(""); // Limpiar el mensaje de error al cambiar el identificador
+              setIdentifierError("");
             }}
             error={!!identifierError}
           />
-          <FormHelperText error>{identifierError}</FormHelperText>
+           <FormHelperText error>{identifierError}</FormHelperText>
+          </StyledFormItem> 
+          <StyledFormItem> 
           <TextField
+          className="miClasePersonalizada"
             variant="outlined"
             margin="normal"
             required
@@ -142,8 +198,10 @@ const Login = () => {
             }}
             error={!!passwordError}
           />
-          <FormHelperText error>{passwordError}</FormHelperText>
-          <Grid container justifyContent="space-between" alignItems="center">
+           <FormHelperText error>{passwordError}</FormHelperText>
+          </StyledFormItem>
+          
+          <StyledGrid container justifyContent="space-between" alignItems="center">
             <FormControlLabel
               control={
                 <Checkbox
@@ -156,10 +214,10 @@ const Login = () => {
             />
             <Typography variant="body2">
               <Link to="/forgot-password" target="_blank">
-                ¿Olvidaste tu contraceña?
+                ¿Olvidaste tu contraseña?
               </Link>
             </Typography>
-          </Grid>
+          </StyledGrid>
 
           <Button
             type="button"
@@ -184,16 +242,13 @@ const Login = () => {
               {error}
             </MuiAlert>
           </Snackbar>
-        </StyledForm>
-        <Grid container justify="flex-end">
-          <Grid item>
-            <Typography variant="body2">
-              ¿No tienes una cuenta? <Link to="/register">Registrarse</Link>
-            </Typography>
-          </Grid>
-        </Grid>
-      </div>
-    </StyledContainer>
+          <StyledTypography variant="body2">
+            ¿No tienes una cuenta? <Link to="/register">Registrarse</Link>
+          </StyledTypography>
+          </StyledFormContainerBox>
+      </StyledFormContainer>
+      <StyledImageContainer />
+    </StyledContainer> 
   );
 };
 

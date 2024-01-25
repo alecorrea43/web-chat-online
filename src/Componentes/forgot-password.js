@@ -13,6 +13,7 @@ const ForgotPassword = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [counter, setCounter] = useState(10);
+  const [emailError, setEmailError] = useState("");
 
   const handleSnackbarClose = () => {
     setError("");
@@ -20,14 +21,54 @@ const ForgotPassword = () => {
   };
 
   const validateEmail = (email) => {
-    // Lógica de validación de correo electrónico, adaptar según sea necesario
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
+  const checkExistingRequest = async (email) => {
+    try {
+      const response = await fetch("http://localhost:3001/check-existing-request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Error en la verificación");
+      }
+
+      return data.exists;
+    } catch (error) {
+      console.error("Error en la verificación:", error.message);
+      return false;
+    }
+  };
+
   const handleForgotPassword = async () => {
-    if (!email || !validateEmail(email)) {
-      setError("Por favor, ingrese un correo electrónico válido.");
+    // Validar el campo de correo electrónico
+    if (!email) {
+      setEmailError("Por favor, ingrese su correo electrónico.");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setEmailError("Por favor, ingrese un correo electrónico válido.");
+      return;
+    }
+
+    // Limpiar el error del campo de correo electrónico
+    setEmailError("");
+
+    // Validar si ya hay una solicitud pendiente
+    const hasExistingRequest = await checkExistingRequest(email);
+    if (hasExistingRequest) {
+      setError("Ya se ha enviado una solicitud para este correo electrónico.");
       return;
     }
 
@@ -92,7 +133,12 @@ const ForgotPassword = () => {
           name="email"
           autoComplete="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setEmailError("");
+          }}
+          error={!!emailError}
+          helperText={emailError}
         />
 
         <Button
@@ -113,7 +159,7 @@ const ForgotPassword = () => {
           <MuiAlert
             elevation={6}
             variant="filled"
-            severity={success ? "success" : "error"}
+            severity={success ? "success" : "info"}
             onClose={handleSnackbarClose}
           >
             {success
