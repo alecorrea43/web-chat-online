@@ -1,4 +1,6 @@
 // Login.js
+
+import videoBackground from "./image/1509404557.mp4";
 import "./styles/styles.css";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,7 +18,6 @@ import {
 import MuiAlert from "@mui/material/Alert";
 import { styled } from "@mui/system";
 
-
 const StyledContainer = styled(Box)({
   display: "flex",
   height: "100vh",
@@ -27,40 +28,53 @@ const StyledContainer = styled(Box)({
   alignItems: "center",
   justifyContent: "center",
   padding: 0, // Ajusta el valor según tus necesidades
- maxWidth: "100%",
+  maxWidth: "100%",
+  '@media (max-width: 768px)': {
+    flexDirection:"column",
+    width:"100%" // Cambia el ancho al 100% cuando la pantalla es más pequeña que 768px
+  },
+  
 });
-
 
 const StyledFormContainer = styled("div")({
   width: "45%",
   height: "100%",
-  backgroundColor: "#D8EBF6",
+  backgroundColor: "#ffffff",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  
+  '@media (max-width: 768px)': {
+    width:"100%" // Cambia el ancho al 100% cuando la pantalla es más pequeña que 768px
+  },
 });
 const StyledFormContainerBox = styled("div")({
   width: "80%",
-  height:"100%",
+  height: "100%",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
- 
-
 });
 const StyledImageContainer = styled("div")({
   width: "55%",
   height: "100%",
-  backgroundImage: `url(${require('./image/white-flowers-7854806_1280.webp')})`,
-  backgroundSize: "cover",
-  backgroundRepeat: "no-repeat", 
-  backgroundPosition: "center",
+  overflow: "hidden",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  position: "relative",
+  '@media (max-width: 768px)': {
+    width:"100%" // Cambia el ancho al 100% cuando la pantalla es más pequeña que 768px
+  },
+});
+const VideoBackground = styled("video")({
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
 });
 const StyledFormItem = styled("div")({
   marginBottom: "30px",
-  width:"100%" // Ajusta el margen inferior según tus necesidades
+  width: "100%", // Ajusta el margen inferior según tus necesidades
 });
 
 const StyledTitle = styled(Typography)({
@@ -74,6 +88,13 @@ const StyledTypography = styled(Typography)({
 });
 const StyledGrid = styled(Grid)({
   marginBottom: "20px", // Ajusta el margen inferior según tus necesidades
+});
+const TextOverlay = styled("div")({
+  width:"80%",
+  height:"30%",
+  position: "absolute",
+  color: "#ffffff",
+   // Color del texto
 });
 
 const Login = () => {
@@ -154,60 +175,62 @@ const Login = () => {
   return (
     <StyledContainer component="main" maxWidth="xl">
       <StyledFormContainer>
-      <StyledFormContainerBox>
-        <StyledTitle component="h1" variant="h5">
-          Iniciar Sesión
-        </StyledTitle>
-        <StyledFormItem> 
-          <TextField
-          
-          className="miClasePersonalizada"
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="identifier"
-            label="Usuario o Correo Electrónico"
-            name="identifier"
-            autoComplete="username"
-            value={identifier}
-            onChange={(e) => {
-              setIdentifier(e.target.value);
-              setIdentifierError("");
-            }}
-            error={!!identifierError}
-          />
-           <FormHelperText error>{identifierError}</FormHelperText>
-          </StyledFormItem> 
-          <StyledFormItem> 
-          <TextField
-          className="miClasePersonalizada"
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Contraseña"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setPasswordError("");
-            }}
-            error={!!passwordError}
-          />
-           <FormHelperText error>{passwordError}</FormHelperText>
+        <StyledFormContainerBox>
+          <StyledTitle component="h1" variant="h5">
+            Iniciar Sesión
+          </StyledTitle>
+          <StyledFormItem>
+            <TextField
+              className="miClasePersonalizada"
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="identifier"
+              label="Usuario o Correo Electrónico"
+              name="identifier"
+              autoComplete="username"
+              value={identifier}
+              onChange={(e) => {
+                setIdentifier(e.target.value);
+                setIdentifierError("");
+              }}
+              error={!!identifierError}
+            />
+            <FormHelperText error>{identifierError}</FormHelperText>
           </StyledFormItem>
-          
-          <StyledGrid container justifyContent="space-between" alignItems="center">
+          <StyledFormItem>
+            <TextField
+              className="miClasePersonalizada"
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Contraseña"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordError("");
+              }}
+              error={!!passwordError}
+            />
+            <FormHelperText error>{passwordError}</FormHelperText>
+          </StyledFormItem>
+
+          <StyledGrid
+            container
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <FormControlLabel
               control={
                 <Checkbox
                   checked={rememberPassword}
                   onChange={() => setRememberPassword(!rememberPassword)}
-                  
                 />
               }
               label="Recordar Contraseña"
@@ -245,10 +268,31 @@ const Login = () => {
           <StyledTypography variant="body2">
             ¿No tienes una cuenta? <Link to="/register">Registrarse</Link>
           </StyledTypography>
-          </StyledFormContainerBox>
+        </StyledFormContainerBox>
       </StyledFormContainer>
-      <StyledImageContainer />
-    </StyledContainer> 
+      <StyledImageContainer>
+        <VideoBackground autoPlay loop muted>
+          <source src={videoBackground} type="video/webm" />
+        </VideoBackground>
+        <TextOverlay>
+          <Typography
+            variant="h4"
+            style={{ fontFamily: "IBM Plex Mono", fontSize: "60px" }}>
+            Chat-web-online
+          </Typography>
+          <Typography style={{ fontFamily: "IBM Plex Mono" }}>
+            "Explora la experiencia única de nuestra plataforma de chat web en
+            línea, donde la comunicación fluye sin problemas. Conéctate con
+            personas de todo el mundo de manera instantánea, comparte ideas, haz
+            nuevos amigos y disfruta de conversaciones en tiempo real. Nuestra
+            interfaz intuitiva y fácil de usar te brinda la libertad de
+            expresarte y conectarte de una manera divertida y emocionante. Únete
+            a la comunidad de nuestro chat web y descubre un espacio vibrante
+            donde las conversaciones cobran vida."
+          </Typography>
+        </TextOverlay>
+      </StyledImageContainer>
+    </StyledContainer>
   );
 };
 

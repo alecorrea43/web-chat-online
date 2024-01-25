@@ -1,3 +1,6 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 .miClasePersonalizada .MuiOutlinedInput-root {
     border: none;
     border-radius: 0; /* Quita los bordes redondeados */
@@ -26,7 +29,7 @@
     color: inherit;
   }
   input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 1000px #D8EBF6 inset;
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
     transition: background-color 5000s ease-in-out 0s;
   }
   
@@ -58,3 +61,8 @@
   .cssButton:hover {
     background-color: rgb(56, 192, 219) !important; /* Cambia el color de fondo al pasar el ratón (hover) */
   }
+ 
+ 
+  
+ 
+ 
