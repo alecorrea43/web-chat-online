@@ -20,7 +20,6 @@ import { styled } from "@mui/system";
 
 const StyledContainer = styled(Box)({
   display: "flex",
-  height: "100vh",
   width: "100%",
   marginLeft: "auto",
   marginRight: "auto",
@@ -37,7 +36,7 @@ const StyledContainer = styled(Box)({
 
 const StyledFormContainer = styled("div")({
   width: "45%",
-  height: "100%",
+  height: "100vh",
   backgroundColor: "#ffffff",
   display: "flex",
   alignItems: "center",
@@ -58,7 +57,7 @@ const StyledFormContainerBox = styled("div")({
 });
 const StyledImageContainer = styled("div")({
   width: "55%",
-  height: "100%",
+  height: "100vh",
   overflow: "hidden",
   display: "flex",
   justifyContent: "center",

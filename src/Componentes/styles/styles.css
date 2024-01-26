@@ -75,11 +75,7 @@
   
   @media (max-width: 768px) {
     .main-title {
-      font-size: 4.2vw;
-    }
-  
-    .main-text {
-      font-size: 2.2vw;
+      font-size: 8vw;
     }
   }
 
