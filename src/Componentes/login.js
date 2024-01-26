@@ -29,11 +29,10 @@ const StyledContainer = styled(Box)({
   justifyContent: "center",
   padding: 0, // Ajusta el valor según tus necesidades
   maxWidth: "100%",
-  '@media (max-width: 768px)': {
-    flexDirection:"column",
-    width:"100%" // Cambia el ancho al 100% cuando la pantalla es más pequeña que 768px
+  "@media (max-width: 768px)": {
+    flexDirection: "column",
+    width: "100%", // Cambia el ancho al 100% cuando la pantalla es más pequeña que 768px
   },
-  
 });
 
 const StyledFormContainer = styled("div")({
@@ -43,8 +42,10 @@ const StyledFormContainer = styled("div")({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  '@media (max-width: 768px)': {
-    width:"100%" // Cambia el ancho al 100% cuando la pantalla es más pequeña que 768px
+  order: 1, // Cambia el orden para pantallas más pequeñas
+  "@media (max-width: 768px)": {
+    width: "100%",
+    order: 2, // Cambia el orden para pantallas más pequeñas
   },
 });
 const StyledFormContainerBox = styled("div")({
@@ -63,8 +64,10 @@ const StyledImageContainer = styled("div")({
   justifyContent: "center",
   alignItems: "center",
   position: "relative",
-  '@media (max-width: 768px)': {
-    width:"100%" // Cambia el ancho al 100% cuando la pantalla es más pequeña que 768px
+  order: 2, // Cambia el orden para pantallas más pequeñas
+  "@media (max-width: 768px)": {
+    width: "100%",
+    order: 1, // Cambia el orden para pantallas más pequeñas
   },
 });
 const VideoBackground = styled("video")({
@@ -90,11 +93,16 @@ const StyledGrid = styled(Grid)({
   marginBottom: "20px", // Ajusta el margen inferior según tus necesidades
 });
 const TextOverlay = styled("div")({
-  width:"80%",
-  height:"30%",
+  width: "80%",
+  height: "80%",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
   position: "absolute",
   color: "#ffffff",
-   // Color del texto
+  textAlign: "center",
+  boxSizing: "border-box",
 });
 
 const Login = () => {
@@ -275,12 +283,8 @@ const Login = () => {
           <source src={videoBackground} type="video/webm" />
         </VideoBackground>
         <TextOverlay>
-          <Typography
-            variant="h4"
-            style={{ fontFamily: "IBM Plex Mono", fontSize: "60px" }}>
-            Chat-web-online
-          </Typography>
-          <Typography style={{ fontFamily: "IBM Plex Mono" }}>
+          <p className="main-title">Chat-web-online</p>
+          <p className="main-text">
             "Explora la experiencia única de nuestra plataforma de chat web en
             línea, donde la comunicación fluye sin problemas. Conéctate con
             personas de todo el mundo de manera instantánea, comparte ideas, haz
@@ -289,7 +293,7 @@ const Login = () => {
             expresarte y conectarte de una manera divertida y emocionante. Únete
             a la comunidad de nuestro chat web y descubre un espacio vibrante
             donde las conversaciones cobran vida."
-          </Typography>
+          </p>
         </TextOverlay>
       </StyledImageContainer>
     </StyledContainer>

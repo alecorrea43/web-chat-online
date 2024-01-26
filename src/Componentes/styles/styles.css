@@ -61,8 +61,26 @@
   .cssButton:hover {
     background-color: rgb(56, 192, 219) !important; /* Cambia el color de fondo al pasar el ratón (hover) */
   }
- 
- 
+  .text-overlay {
+    font-family: "IBM Plex Mono", sans-serif;
+  }
   
- 
+  .main-title {
+    font-size: 50px;
+  }
+  
+  .main-text {
+    font-size: 18px;
+  }
+  
+  @media (max-width: 768px) {
+    .main-title {
+      font-size: 4.2vw;
+    }
+  
+    .main-text {
+      font-size: 2.2vw;
+    }
+  }
+  
  
