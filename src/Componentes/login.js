@@ -112,6 +112,7 @@ const Login = () => {
   const [identifier, setIdentifier] = useState("");
   const [identifierError, setIdentifierError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [showButton, setShowButton] = useState(false);
   const navigate = useNavigate();
 
   const handleSnackbarClose = () => {
@@ -179,9 +180,28 @@ const Login = () => {
     }
   }, [identifier]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setShowButton(window.innerWidth < 768); // Invertir la lógica para mostrar el botón cuando el ancho sea menor a 768
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []); // El array vacío asegura que este efecto solo se ejecute una vez al montar el componente
+
+  const handleButtonClick = () => {
+    // Lógica de redirección aquí
+    // Por ejemplo, redirigir a la sección con el id "miSeccion"
+    window.location.href = '#miSeccion';
+  };
+
   return (
     <StyledContainer component="main" maxWidth="xl">
-      <StyledFormContainer>
+      <StyledFormContainer id="formulario">
         <StyledFormContainerBox>
           <StyledTitle component="h1" variant="h5">
             Iniciar Sesión
@@ -286,13 +306,27 @@ const Login = () => {
           <p className="main-text">
             "Explora la experiencia única de nuestra plataforma de chat web en
             línea, donde la comunicación fluye sin problemas. Conéctate con
-            personas de todo el mundo de manera instantánea, comparte ideas, haz
-            nuevos amigos y disfruta de conversaciones en tiempo real. Nuestra
-            interfaz intuitiva y fácil de usar te brinda la libertad de
-            expresarte y conectarte de una manera divertida y emocionante. Únete
-            a la comunidad de nuestro chat web y descubre un espacio vibrante
-            donde las conversaciones cobran vida."
+            personas de todo el mundo de manera instantánea."
+            Inicia sesion para usar nuestra web.
           </p>
+          {showButton && (
+            <Button
+              type="button"
+              fullWidth
+              variant="contained"
+              className="cssButton2"
+              onClick={() => {
+                handleButtonClick();
+                // Lógica para desplazarse hacia la sección del formulario
+                const formularioSection = document.getElementById('formulario');
+                if (formularioSection) {
+                  formularioSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
+              Empezar
+            </Button>
+          )}
         </TextOverlay>
       </StyledImageContainer>
     </StyledContainer>
