@@ -38,12 +38,6 @@
     background-color: transparent !important; /* Asegura que el fondo sea transparente */
   }
 
-  .MuiCheckbox-colorPrimary.Mui-checked:focus {
-    outline: 1px solid black !important;
-  }
-  .MuiCheckbox-colorPrimary.Mui-checked {
-    color: black !important;
-  }
   a {
     color: blue !important; /* Cambia el color del enlace a azul */
     text-decoration: none; /* Elimina el subrayado del enlace */
@@ -85,18 +79,7 @@
       font-size: 16px;
     }
   }
-
-
- .cssButton2{
-  background-color: transparent !important; /* Cambia el color de fondo a negro */
-  color: white !important; /* Cambia el color del texto a blanco */
-  border-radius: 0 !important; 
-  border: 1px solid #ffffff !important;
- }
- .cssButton2:hover {
-  background-color: rgb(56, 192, 219) !important; /* Cambia el color de fondo al pasar el ratón (hover) */
-}
-  
+ 
 
 
 
