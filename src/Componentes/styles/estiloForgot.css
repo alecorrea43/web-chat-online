@@ -1,0 +1,77 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+.miClasePersonalizada .MuiOutlinedInput-root {
+    border: none;
+    border-radius: 0; /* Quita los bordes redondeados */
+  }
+  
+  .miClasePersonalizada .MuiOutlinedInput-notchedOutline {
+    border: none;
+    border-bottom: 1px solid #000; /* Puedes ajustar el color y el grosor según tus preferencias */
+  }
+
+  /* Anula el color del borde cuando está enfocado */
+  .miClasePersonalizada .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-bottom: 1px solid #000; /* Mantén el mismo color y grosor del borde al estar enfocado */
+  }
+  
+  /* Cambio de color al pasar el cursor sobre el componente */
+  .miClasePersonalizada .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-bottom: 1px solid rgb(64, 151, 202); /* Color azul para el hover */
+  }
+
+  .miClasePersonalizada .MuiOutlinedInput-input {
+    border: none;
+  }
+  
+  .miClasePersonalizada .MuiInputLabel-root.Mui-focused {
+    color: inherit;
+  }
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  
+  /* Estilo para el campo de entrada */
+  .miClasePersonalizada input {
+    background-color: transparent !important; /* Asegura que el fondo sea transparente */
+  }
+
+  .cssButton {
+    background-color: black !important; /* Cambia el color de fondo a negro */
+    color: white !important; /* Cambia el color del texto a blanco */
+    border-radius: 0 !important; /* Elimina los bordes redondeados */
+    margin-top: 20px !important;
+  }
+  .cssButton:hover {
+    background-color: rgb(56, 192, 219) !important; /* Cambia el color de fondo al pasar el ratón (hover) */
+  }
+  .text-overlay {
+    font-family: "IBM Plex Mono", sans-serif;
+  }
+  
+  .main-title {
+    font-size: 40px !important; 
+    font-family: "IBM Plex Mono", sans-serif !important;
+  }
+  
+  .main-text {
+    font-size: 18px  !important;
+    font-family: "IBM Plex Mono", sans-serif  !important;
+  }
+  
+  @media (max-width: 768px) {
+    .main-title {
+      font-size: 20px  !important;
+    }
+  }
+  @media (max-width: 768px) {
+    .main-text {
+      font-size: 16px  !important;
+    }
+  }
+ 
+
+
+

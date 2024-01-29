@@ -21,6 +21,8 @@ const ResetPassword = () => {
   const [userEmail, setUserEmail] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [shouldClose, setShouldClose] = useState(false);
+  
 
   useEffect(() => {
     const fetchUserEmail = async () => {
@@ -49,12 +51,20 @@ const ResetPassword = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
+  
+    // Validación de espacios en la contraseña
+    if (newPassword.includes(' ')) {
+      setError('La nueva contraseña no puede contener espacios.');
+      setOpenSnackbar(true);
+      return;
+    }
+  
     if (newPassword.length < 6) {
       setError('La nueva contraseña debe tener al menos 6 caracteres.');
       setOpenSnackbar(true);
       return;
     }
-
+  
     try {
       const response = await fetch(`http://localhost:3001/reset-password/${token}`, {
         method: 'PUT',
@@ -63,15 +73,21 @@ const ResetPassword = () => {
         },
         body: JSON.stringify({ newPassword })
       });
-
+  
+      const data = await response.json();
+  
       if (response.ok) {
-        setSuccessMessage('Tu contraseña ha sido restablecida exitosamente. Ahora puedes iniciar sesión con tu nueva contraseña.');
+        setSuccessMessage(data.message); // Usa el mensaje del servidor
+        setError(''); 
+        setOpenSnackbar(true);
+        setShouldClose(true);
+      
       } else {
-        setError('Ha ocurrido un error al restablecer tu contraseña. Por favor, inténtalo de nuevo más tarde.');
+        setError(data.error || 'Ha ocurrido un error al restablecer tu contraseña. Por favor, inténtalo de nuevo más tarde.');
+        setOpenSnackbar(true);
       }
     } catch (error) {
       setError('Ha ocurrido un error en la solicitud. Por favor, inténtalo de nuevo más tarde.');
-    } finally {
       setOpenSnackbar(true);
     }
   };
@@ -79,6 +95,18 @@ const ResetPassword = () => {
   const handleSnackbarClose = () => {
     setOpenSnackbar(false);
   };
+
+  useEffect(() => {
+    if (shouldClose) {
+      const timeoutId = setTimeout(() => {
+        setOpenSnackbar(false);
+        window.close();
+      }, 2000);
+
+      return () => clearTimeout(timeoutId); // Limpiar el temporizador si el componente se desmonta antes de que se complete
+    }
+  }, [shouldClose]);
+
 
   return (
     <Container component="main" maxWidth="xs">

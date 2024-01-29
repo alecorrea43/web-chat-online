@@ -2,11 +2,60 @@ import React, { useState, useEffect } from 'react';
 import {
   TextField,
   Button,
-  Typography,
-  Container,
   Snackbar,
+  Typography,
+  Box,
 } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
+import { styled } from "@mui/system";
+import "./styles/estiloForgot.css";
+
+
+const StyledContainer = styled(Box)({
+  display: "flex",
+  width: "100%",
+  height:"100vh",
+  marginLeft: "auto",
+  marginRight: "auto",
+  boxSizing: "border-box",
+  alignItems: "center",
+  justifyContent: "center",
+
+  padding: 0, // Ajusta el valor según tus necesidades
+  maxWidth: "100%",
+  "@media (max-width: 768px)": {
+    flexDirection: "column",
+    width: "100%", // Cambia el ancho al 100% cuando la pantalla es más pequeña que 768px
+  },
+});
+const StyledFormContainer = styled("div")({
+  width: "75%",
+  height:"80%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+ backgroundColor:"#ffffff",
+  "@media (max-width: 768px)": {
+    width: "100%",
+   
+  },
+});
+const StyledFormContainerBox = styled("div")({
+  width: "55%",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  "@media (max-width: 768px)": {
+    width: "95%",
+  }
+});
+const StyledTitle = styled(Typography)({
+  textAlign: "center",
+  marginBottom: "30px",
+});
+
+
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -118,12 +167,17 @@ const ForgotPassword = () => {
   }, [counter]);
 
   return (
-    <Container component="main" maxWidth="xs">
-      <div>
-        <Typography component="h1" variant="h5">
-          Recuperar contraseña
-        </Typography>
+    <StyledContainer component="main" maxWidth="xl">
+     <StyledFormContainer>
+        <StyledFormContainerBox>
+          <StyledTitle className="main-title">
+            Restablecer contraceña
+          </StyledTitle>
+          <StyledTitle className="main-text"> 
+            Introduzca su correo para restablecer la contraceña.
+          </StyledTitle>
         <TextField
+        className="miClasePersonalizada"
           variant="outlined"
           margin="normal"
           required
@@ -142,13 +196,14 @@ const ForgotPassword = () => {
         />
 
         <Button
+        className="cssButton"
           type="button"
           fullWidth
           variant="contained"
           color="primary"
           onClick={handleForgotPassword}
         >
-          Enviar Recuperación
+          Enviar
         </Button>
 
         <Snackbar
@@ -167,8 +222,9 @@ const ForgotPassword = () => {
               : error}
           </MuiAlert>
         </Snackbar>
-      </div>
-    </Container>
+      </StyledFormContainerBox>
+        </StyledFormContainer>
+    </StyledContainer>
   );
 };
 
