@@ -6,12 +6,59 @@ import {
   Button,
   Snackbar,
   Alert,
-  Container,
   Box,
   IconButton,
   InputAdornment,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { styled } from "@mui/system";
+import "./styles/estiloReset.css";
+
+const StyledContainer = styled(Box)({
+  display: "flex",
+  width: "100%",
+  height:"100vh",
+  marginLeft: "auto",
+  marginRight: "auto",
+  boxSizing: "border-box",
+  alignItems: "center",
+  justifyContent: "center",
+
+  padding: 0, // Ajusta el valor según tus necesidades
+  maxWidth: "100%",
+  "@media (max-width: 768px)": {
+    flexDirection: "column",
+    width: "100%", // Cambia el ancho al 100% cuando la pantalla es más pequeña que 768px
+  },
+});
+const StyledFormContainer = styled("div")({
+  width: "75%",
+  height:"80%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+ backgroundColor:"#ffffff",
+  "@media (max-width: 768px)": {
+    width: "100%",
+   
+  },
+});
+const StyledFormContainerBox = styled("div")({
+  width: "55%",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  "@media (max-width: 768px)": {
+    width: "95%",
+  }
+});
+const StyledTitle = styled(Typography)({
+  textAlign: "center",
+  marginBottom: "30px",
+});
+
+
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -109,16 +156,15 @@ const ResetPassword = () => {
 
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: (theme) => theme.spacing(4),
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Typography variant="h5">Restablece tu contraseña</Typography>
+    <StyledContainer component="main" maxWidth="xl">
+    <StyledFormContainer>
+       <StyledFormContainerBox>
+         <StyledTitle className="main-title">
+           Restablece tu contraceña
+         </StyledTitle>
+         <StyledTitle className="main-text"> 
+           Introduzca la nueva contraceña.
+         </StyledTitle>
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
@@ -134,6 +180,7 @@ const ResetPassword = () => {
         {userEmail && (
           <form onSubmit={handleResetPassword} style={{ width: '100%', marginTop: '8px' }}>
             <TextField
+            className="miClasePersonalizada"
               label="Nueva Contraseña"
               type={showPassword ? 'text' : 'password'}
               value={newPassword}
@@ -154,13 +201,15 @@ const ResetPassword = () => {
                 ),
               }}
             />
-            <Button type="submit" variant="contained" color="primary" style={{ width: '100%'}}>
+            <Button
+            className="cssButton" type="submit" variant="contained" style={{ width: '100%'}}>
               Restablecer Contraseña
             </Button>
           </form>
         )}
-      </Box>
-    </Container>
+      </StyledFormContainerBox>
+      </StyledFormContainer>
+    </StyledContainer>
   );
 };
 

@@ -171,7 +171,7 @@ const ForgotPassword = () => {
      <StyledFormContainer>
         <StyledFormContainerBox>
           <StyledTitle className="main-title">
-            Restablecer contraceña
+            Recuperar contraceña
           </StyledTitle>
           <StyledTitle className="main-text"> 
             Introduzca su correo para restablecer la contraceña.
