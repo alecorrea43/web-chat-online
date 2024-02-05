@@ -296,7 +296,6 @@ const Register = () => {
       </StyledFormContainer>
       <Snackbar
         open={snackbarOpen}
-        s
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
       >
@@ -309,7 +308,6 @@ const Register = () => {
           {snackbarMessage}
         </MuiAlert>
       </Snackbar>
-
       <StyledImageContainer>
         <VideoBackground autoPlay loop muted>
           <source src={videoBackground} type="video/webm" />

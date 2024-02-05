@@ -18,6 +18,7 @@ import {
 import MuiAlert from "@mui/material/Alert";
 import { styled } from "@mui/system";
 
+
 const StyledContainer = styled(Box)({
   display: "flex",
   width: "100%",
@@ -133,6 +134,7 @@ const Login = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+    
         },
         body: JSON.stringify({
           username: identifier,
@@ -147,13 +149,18 @@ const Login = () => {
       }
 
       setError("");
+    
       console.log("Inicio de sesión exitoso");
+
+      const authToken = data.token;
+        localStorage.setItem(`authToken_${identifier}`, authToken);
 
       if (rememberPassword) {
         localStorage.setItem(`savedPassword_${identifier}`, password);
       }
+      
+      navigate("/chat", { state: { authToken } });
 
-      navigate("/chat");
     } catch (error) {
       console.error("Error en la solicitud:", error.message);
 
@@ -194,8 +201,7 @@ const Login = () => {
   }, []); // El array vacío asegura que este efecto solo se ejecute una vez al montar el componente
 
   const handleButtonClick = () => {
-    // Lógica de redirección aquí
-    // Por ejemplo, redirigir a la sección con el id "miSeccion"
+  
     window.location.href = '#miSeccion';
   };
 
@@ -295,6 +301,8 @@ const Login = () => {
           <StyledTypography variant="body2">
             ¿No tienes una cuenta? <Link to="/register">Registrarse</Link>
           </StyledTypography>
+
+       
         </StyledFormContainerBox>
       </StyledFormContainer>
       <StyledImageContainer>
