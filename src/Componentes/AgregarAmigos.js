@@ -4,22 +4,23 @@ import TextField from "@mui/material/TextField";
 
 const AgregarAmigos = ({ agregarAmigo, tuTokenDeAutenticacion }) => {
   const [usernameAmigo, setUsernameAmigo] = useState("");
-  const [setError] = useState(null);
+  const [error, setError] = useState(null);
+  const jwtSecret = process.env.REACT_APP_JWT_SECRET;
 
-
+  
   const handleInputChange = (event) => {
     setUsernameAmigo(event.target.value);
+    setError(null);
   };
 
   const handleAgregarAmigo = async () => {
     try {
-      console.log("Token enviado:", tuTokenDeAutenticacion);
 
       const response = await fetch("http://localhost:3001/agregar-amigo", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${tuTokenDeAutenticacion}`,
+          Authorization: `Bearer ${tuTokenDeAutenticacion || jwtSecret}`,
         },
         body: JSON.stringify({
           friendUsername:  usernameAmigo,
@@ -30,8 +31,10 @@ const AgregarAmigos = ({ agregarAmigo, tuTokenDeAutenticacion }) => {
         agregarAmigo(data.friends);
         setUsernameAmigo("");
         console.log(data.message);
-      } else if (response.status === 401) {
-        setError("Error de autenticación. Por favor, vuelve a iniciar sesión.");
+      } else if (response.status === 404) {
+        setError("Usuario no encontrado.");
+      } else if (response.status === 200) {
+        setError("Este usuario ya está en tu lista de amigos.");
       } else {
         console.error("Error al agregar amigo:", response.statusText);
       }
@@ -39,7 +42,6 @@ const AgregarAmigos = ({ agregarAmigo, tuTokenDeAutenticacion }) => {
       console.error("Error al agregar amigo:", error);
     }
   };
-
   return (
     <div>
       <TextField
@@ -51,6 +53,7 @@ const AgregarAmigos = ({ agregarAmigo, tuTokenDeAutenticacion }) => {
       <Button variant="contained" onClick={handleAgregarAmigo}>
         Agregar
       </Button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };

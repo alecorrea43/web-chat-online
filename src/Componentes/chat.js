@@ -1,73 +1,67 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation  } from "react-router-dom";
+import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import { useNavigate, useLocation } from "react-router-dom";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useAuth } from "./AuthContext";
 import AgregarAmigos from "./AgregarAmigos";
 import "./styles/Chat.css";
+import io from "socket.io-client";
 
-const Chat = () => {
-  const { authToken } = useAuth();
+const Chat = (props) => {
   const [loggedInUsers, setLoggedInUsers] = useState([]);
   const [open, setOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
+ 
   const navigate = useNavigate();
   const location = useLocation();
+  const userEmail = location.state?.identifier;
   const authTokenFromLocation = location.state?.authToken;
-
-
+  const { name } = location.state || {};
+  const { authToken, username: storedUsername } = useAuth();
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
+  let socket;
+  
   const handleLogout = (email) => {
-    setUserEmail(email);
-    handleOpen();
+    // Verifica si el correo electrónico del usuario está presente y si el usuario está en la lista de usuarios conectados
+    if (email && loggedInUsers.some((user) => user.email === email)) {
+      handleOpen();
+    } else {
+      console.error(
+        "El usuario no está conectado o no se ha proporcionado un correo electrónico."
+      );
+    }
   };
-
-
-
+ 
   const logout = async () => {
     try {
+      const token = authToken || authTokenFromLocation;
       const response = await fetch("http://localhost:3001/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           email: userEmail,
         }),
       });
-
+  
       if (response.ok) {
-        const updatedLoggedInUsers = loggedInUsers.map((user) => {
-          if (user.email === userEmail) {
-            return { ...user, connected: false };
-          }
-          return user;
-        });
-
-        // Actualizar el estado y almacenar en localStorage
-        setLoggedInUsers(updatedLoggedInUsers);
-        localStorage.setItem(
-          "loggedInUsers",
-          JSON.stringify(updatedLoggedInUsers)
-        );
-
-        // Limpiar el estado del correo electrónico al cerrar sesión
-        setUserEmail("");
-
-        // Cerrar el diálogo
+        console.log("Sesión cerrada exitosamente");
+        
         handleClose();
         navigate("/");
+        
+        // Emitir el evento 'userDisconnected' al servidor
+        if (socket) { // Asegúrate de que socket esté definido antes de emitir
+          socket.emit("userDisconnected", { email: userEmail });
+        }
       } else {
         console.error("Error al cerrar sesión:", response.statusText);
       }
@@ -76,42 +70,49 @@ const Chat = () => {
     }
   };
 
-  const fetchLoggedInUsers = async () => {
-    try {
-      const response = await fetch("http://localhost:3001/logged-in-users", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setLoggedInUsers(data.users);
-        localStorage.setItem("loggedInUsers", JSON.stringify(data.users));
-        return data.users;
-      } else {
-        console.error("Error fetching logged-in users:", response.statusText);
-        return [];
-      }
-    } catch (error) {
-      console.error("Error fetching logged-in users:", error);
-      return [];
-    }
-  };
-
   useEffect(() => {
-    // Obtener el estado almacenado en localStorage al cargar la página
-    const storedLoggedInUsers =
-      JSON.parse(localStorage.getItem("loggedInUsers")) || [];
-    setLoggedInUsers(storedLoggedInUsers);
+    const socket = io("http://localhost:3001");
+    socket.emit("userConnected", { email: userEmail });
 
-    const intervalId = setInterval(() => {
-      fetchLoggedInUsers();
-    }, 1000);
+    // Escucha el evento 'userConnected'
+    socket.on("userConnected", (user) => {
+      setLoggedInUsers((prevUsers) => {
+        const updatedUsers = [...prevUsers, user];
+        console.log("Usuario conectado:", user);
+        console.log("Lista actualizada de usuarios conectados:", updatedUsers);
+        return updatedUsers;
+      });
+    });
 
-    return () => clearInterval(intervalId);
-  }, []);
+    // Escucha el evento 'userDisconnected'
+    socket.on("userDisconnected", (user) => {
+      setLoggedInUsers((prevUsers) => {
+        const updatedUsers = prevUsers.filter((u) => u.email !== user.email);
+        console.log("Usuario desconectado:", user);
+        console.log("Lista actualizada de usuarios conectados:", updatedUsers);
+        return updatedUsers;
+      });
+    });
+
+    // Solicita la lista inicial de usuarios conectados al conectarse
+    socket.emit("getCurrentUsers");
+
+    // Escucha el evento 'currentUsers'
+    socket.on("currentUsers", (users) => {
+      setLoggedInUsers(users);
+      console.log("Lista inicial de usuarios conectados:", users);
+    });
+
+    // Limpia los listeners y desconecta el socket cuando el componente se desmonta
+    return () => {
+      if (socket) {
+        socket.off("userConnected");
+        socket.off("userDisconnected");
+        socket.off("currentUsers");
+        socket.disconnect();
+      }
+    };
+  }, [userEmail]);
 
   const agregarAmigo = (newUsers) => {
     setLoggedInUsers(newUsers);
@@ -120,21 +121,21 @@ const Chat = () => {
   return (
     <div>
       <div>
-        {/* Agregar un AppBar */}
         <AppBar position="static" className="appbar1">
           <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-            {/* Mostrar el nombre de usuario a la derecha */}
             <Typography
               variant="h6"
               component="div"
               sx={{ textAlign: "right" }}
             >
-              {loggedInUsers.length > 0 && loggedInUsers[0].name}
+              {name}
             </Typography>
-            {/* Agregar el botón de cerrar sesión como un IconButton */}
             <IconButton
               color="inherit"
-              onClick={() => handleLogout(loggedInUsers[0].email)}
+              onClick={() => {
+                console.log("Correo electrónico del usuario:", userEmail); // Asegúrate de que userEmail no sea undefined
+                handleLogout(userEmail);
+              }}
             >
               <ExitToAppIcon />
             </IconButton>
@@ -144,11 +145,14 @@ const Chat = () => {
       <p>Bienvenido al chat en línea. ¡Conéctate y comienza a chatear!</p>
 
       <h3>Usuarios Conectados:</h3>
-      <AgregarAmigos agregarAmigo={agregarAmigo} tuTokenDeAutenticacion={authToken || authTokenFromLocation} />
+      <AgregarAmigos
+        agregarAmigo={agregarAmigo}
+        tuTokenDeAutenticacion={authToken || authTokenFromLocation}
+      />
 
       <ul>
         {loggedInUsers
-          .filter((user) => user.email !== loggedInUsers[0].email) // Filtrar el usuario actual
+          .filter((user) => user.name !== storedUsername)
           .map((user) => (
             <li key={user.email}>
               {user.name}

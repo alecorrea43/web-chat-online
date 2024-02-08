@@ -5,6 +5,7 @@ const userSchema = new Schema({
   name: String,
   email: { type: String, unique: true, required: true },
   password: String,
+  connected: { type: Boolean, default: false },
   friends: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

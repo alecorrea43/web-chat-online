@@ -12,6 +12,62 @@ const RecoveryToken = require("./src/Componentes/RecoveryToken.js");
 const loggedInUsers = [];
 const app = express();
 const PORT = process.env.PORT || 3001;
+const http = require("http");
+const socketIo = require("socket.io");
+
+
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: 'http://localhost:3000', 
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['my-custom-header'],
+    credentials: true
+  }
+});
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+
+  // Escuchar el evento 'userConnected'
+  socket.on("userConnected", (userData) => {
+    // Crear un objeto de usuario con el socketId y el email
+    const user = {
+      socketId: socket.id,
+      email: userData.email,
+    };
+    // Añadir al usuario a la lista loggedInUsers
+    loggedInUsers.push(user);
+    // Emitir un evento para notificar a otros usuarios que un usuario se ha conectado
+    io.emit("userConnected", user);
+  });
+
+  // Manejar el evento de desconexión
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+    // Encontrar el índice del usuario desconectado por socket.id
+    const userIndex = loggedInUsers.findIndex(u => u.socketId === socket.id);
+    if (userIndex !== -1) {
+      // Guardar el usuario desconectado antes de removerlo de la lista
+      const user = loggedInUsers[userIndex];
+      // Verificar que el usuario tenga un email
+      if (user && user.email) {
+        // Remover el usuario desconectado de la lista loggedInUsers
+        loggedInUsers.splice(userIndex,   1);
+        // Notificar a otros usuarios que un usuario se ha desconectado
+        io.emit("userDisconnected", user);
+        console.log(`User disconnected: ${user.email}`);
+      } else {
+        console.log("User object does not have an email property");
+      }
+    } else {
+      console.log("No user found to disconnect");
+    }
+  });
+});
+
+
+
 
 // Configuración de CORS
 const corsOptions = {
@@ -75,10 +131,11 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// Ruta de inicio de sesión
+
 
 // Ruta de inicio de sesión
 app.post("/login", async (req, res) => {
+
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -97,28 +154,33 @@ app.post("/login", async (req, res) => {
 
       if (passwordMatch) {
         const token = jwt.sign(
-          { username, email: user.email },
+          { username: user.name, email: user.email },
           process.env.JWT_SECRET,
           { expiresIn: "1h" }
         );
-        console.log("Token generado:", token);
+        
 
         const existingUserIndex = loggedInUsers.findIndex(
           (u) => u.email === user.email
         );
 
         if (existingUserIndex !== -1) {
-          loggedInUsers[existingUserIndex].username = username;
+          loggedInUsers[existingUserIndex].username = user.name;
         } else {
           loggedInUsers.push({
-            username,
+            username: user.name,
             email: user.email,
             token,
             name: user.name,
           });
         }
 
-        return res.json({ token });
+        return res.json({ 
+          token, 
+          username: user.name || username,
+          email: user.email,
+          name: user.name 
+        });
       } else {
         return res.status(401).json({ error: "Contraseña incorrecta" });
       }
@@ -136,19 +198,14 @@ app.post("/login", async (req, res) => {
   }
 });
 
+
+
 // Ruta para obtener usuarios conectados
-app.get("/logged-in-users", async (req, res) => {
+app.get("/logged-in-users", (req, res) => {
   try {
-    const connectedUsers = loggedInUsers.map((user) => user.email);
-
-    const users = await User.find(
-      { email: { $in: connectedUsers } },
-      "email name"
-    );
-
-    const formattedUsers = users.map((user) => ({
-      email: user.email,
-      name: user.name,
+    
+    const formattedUsers = loggedInUsers.map((user) => ({
+      ...user,
       connected: true,
     }));
 
@@ -161,38 +218,38 @@ app.get("/logged-in-users", async (req, res) => {
 
 // Ruta para cerrar sesión
 app.post("/logout", (req, res) => {
-  const { email } = req.body;
+  // Extraer el token del encabezado Authorization
+  const token = req.header("Authorization").replace("Bearer ", "");
 
-  console.log(
-    "Solicitud de cierre de sesión recibida. Correo electrónico:",
-    email
-  );
+  // Verificar y decodificar el token
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    console.error("Error al verificar el token:", err);
+    return res.status(401).json({ error: "Token inválido o expirado." });
+  }
 
-  // Busca al usuario en la lista de usuarios conectados
-  const userIndex = loggedInUsers.findIndex((user) => user.email === email);
+  // Extraer el correo electrónico del token decodificado
+  const userEmail = decoded.email;
+
+  // Buscar al usuario en la lista loggedInUsers
+  const userIndex = loggedInUsers.findIndex((user) => user.email === userEmail);
 
   if (userIndex !== -1) {
-    // Actualiza el estado del usuario a desconectado (punto rojo)
+    // Actualizar el estado de conexión del usuario
     loggedInUsers[userIndex].connected = false;
 
-    // Imprime información en la consola para depurar
-    console.log("Usuario encontrado y marcado como desconectado");
-    console.log(
-      "Lista de usuarios actualizada después de cerrar sesión:",
-      loggedInUsers
-    );
+    // Emitir el evento 'userDisconnected' a los clientes conectados
+    io.emit('userDisconnected', loggedInUsers[userIndex]);
 
-    // Envía la lista actualizada de usuarios después de cerrar sesión
-    res.json({ message: "Sesión cerrada exitosamente", users: loggedInUsers });
+    res.json({ message: "Sesión cerrada exitosamente" });
   } else {
-    // Imprime información en la consola para depurar
-    console.log("Usuario no encontrado en la lista de usuarios conectados");
-
-    res.json({
-      message: "Usuario no encontrado en la lista de usuarios conectados",
-    });
+    res.json({ message: "Usuario no encontrado en la lista de usuarios conectados" });
   }
 });
+
+
 
 //ruta para restablecer contraceña
 app.post("/forgot-password", async (req, res) => {
@@ -409,9 +466,11 @@ const authenticate = async (req, res, next) => {
     console.log("Token recibido en el servidor:", token);
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
     console.log("Decoded Token:", decoded);
 
-    const user = await User.findOne({ _id: decoded._id, 'tokens.token': token });
+    const user = await User.findOne({ email: decoded.email });
+
 
     if (!user) {
       throw new Error('Token no válido');
@@ -427,9 +486,6 @@ const authenticate = async (req, res, next) => {
     res.status(401).send({ error: 'Error de autenticación' });
   }
 };
-
-
-
 
 
 
@@ -452,9 +508,10 @@ app.post("/agregar-amigo", authenticate, async (req, res) => {
     console.log("req.user.friends:", req.user.friends);
 
     const isAlreadyFriend =
-      req.user && req.user.friends
-        ? req.user.friends.includes(friend._id)
-        : false;
+    req.user && req.user.friends
+      ? req.user.friends.map(friendId => friendId.toString()).includes(friend._id.toString())
+      : false;
+  
 
     if (isAlreadyFriend) {
       return res
@@ -591,6 +648,6 @@ async function sendConfirmationEmail(email) {
 
 // Función para insertar un nuevo usuario en la base de datos
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

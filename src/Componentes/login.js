@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import { styled } from "@mui/system";
-
+import io from 'socket.io-client';
 
 const StyledContainer = styled(Box)({
   display: "flex",
@@ -105,6 +105,7 @@ const TextOverlay = styled("div")({
   boxSizing: "border-box",
 });
 
+
 const Login = () => {
   const [password, setPassword] = useState("");
   const [rememberPassword, setRememberPassword] = useState(false);
@@ -115,10 +116,12 @@ const Login = () => {
   const [passwordError, setPasswordError] = useState("");
   const [showButton, setShowButton] = useState(false);
   const navigate = useNavigate();
+  
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
+ 
 
   const handleLogin = async () => {
     if (!identifier || !password) {
@@ -134,7 +137,6 @@ const Login = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-    
         },
         body: JSON.stringify({
           username: identifier,
@@ -143,24 +145,34 @@ const Login = () => {
       });
 
       const data = await response.json();
-
+      console.log("Datos del usuario:", data);
       if (!response.ok) {
         throw new Error(data.error || "Error en la solicitud");
       }
-
+      const socket = io("http://localhost:3001");
+      socket.emit("userConnected", { email: data.email });
       setError("");
-    
+
       console.log("Inicio de sesión exitoso");
 
       const authToken = data.token;
-        localStorage.setItem(`authToken_${identifier}`, authToken);
+      const username = data.name; 
+      const userEmail = data.email;
 
-      if (rememberPassword) {
-        localStorage.setItem(`savedPassword_${identifier}`, password);
-      }
-      
-      navigate("/chat", { state: { authToken } });
+      localStorage.setItem(`loggedInUser_${userEmail}`, userEmail);
+      localStorage.setItem(`authToken_${userEmail}`, authToken);
 
+    localStorage.setItem(`loggedInUser_${username}`, username);
+
+    if (rememberPassword) {
+      localStorage.setItem(`savedPassword_${identifier}`, password);
+    }
+ 
+
+    navigate("/chat", { state: { authToken, identifier: userEmail, name: username } });
+
+
+  
     } catch (error) {
       console.error("Error en la solicitud:", error.message);
 
@@ -180,6 +192,8 @@ const Login = () => {
     }
   };
 
+
+
   useEffect(() => {
     const savedPassword = localStorage.getItem(`savedPassword_${identifier}`);
     if (savedPassword && identifier) {
@@ -192,17 +206,16 @@ const Login = () => {
       setShowButton(window.innerWidth < 768); // Invertir la lógica para mostrar el botón cuando el ancho sea menor a 768
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     handleResize();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []); // El array vacío asegura que este efecto solo se ejecute una vez al montar el componente
 
   const handleButtonClick = () => {
-  
-    window.location.href = '#miSeccion';
+    window.location.href = "#miSeccion";
   };
 
   return (
@@ -301,8 +314,6 @@ const Login = () => {
           <StyledTypography variant="body2">
             ¿No tienes una cuenta? <Link to="/register">Registrarse</Link>
           </StyledTypography>
-
-       
         </StyledFormContainerBox>
       </StyledFormContainer>
       <StyledImageContainer>
@@ -314,8 +325,8 @@ const Login = () => {
           <p className="main-text">
             "Explora la experiencia única de nuestra plataforma de chat web en
             línea, donde la comunicación fluye sin problemas. Conéctate con
-            personas de todo el mundo de manera instantánea."
-            Inicia sesion para usar nuestra web.
+            personas de todo el mundo de manera instantánea." Inicia sesion para
+            usar nuestra web.
           </p>
           {showButton && (
             <Button
@@ -326,9 +337,9 @@ const Login = () => {
               onClick={() => {
                 handleButtonClick();
                 // Lógica para desplazarse hacia la sección del formulario
-                const formularioSection = document.getElementById('formulario');
+                const formularioSection = document.getElementById("formulario");
                 if (formularioSection) {
-                  formularioSection.scrollIntoView({ behavior: 'smooth' });
+                  formularioSection.scrollIntoView({ behavior: "smooth" });
                 }
               }}
             >
@@ -340,5 +351,6 @@ const Login = () => {
     </StyledContainer>
   );
 };
+
 
 export default Login;
