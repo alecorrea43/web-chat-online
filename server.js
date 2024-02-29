@@ -28,56 +28,62 @@ const io = socketIo(server, {
 
 io.on("connection", (socket) => {
   console.log("New client connected");
-
+ 
   // Almacenar temporalmente el socketId y el email del usuario
   let tempUser = {
-    socketId: socket.id,
-    email: null,
-    name: null,
+     socketId: socket.id,
+     email: null,
+     name: null,
   };
-
+ 
   // Escuchar el evento 'userConnected'
   socket.on("userConnected", (userData) => {
     // Actualizar el nombre y el email del usuario temporal
     tempUser.name = userData.name;
     tempUser.email = userData.email;
-  
+   
     // Solo emitir el evento 'userConnected' si el nombre del usuario está disponible
     if (tempUser.name) {
-      // Añadir al usuario a la lista global de loggedInUsers
-      loggedInUsers.push(tempUser);
-      // Emitir un evento para notificar a todos los usuarios conectados que un usuario se ha conectado
-      io.emit("userConnected", tempUser);
-      // Emitir la lista actualizada de usuarios conectados a todos los clientes
-      io.emit("currentUsers", loggedInUsers);
+       // Verificar si el usuario ya está en la lista loggedInUsers por email
+       const existingUserIndex = loggedInUsers.findIndex(u => u.email === tempUser.email);
+       if (existingUserIndex === -1) {
+         // Si el usuario no existe, añadir al usuario a la lista global de loggedInUsers
+         // Asegúrate de establecer el estado 'connected' a true
+         loggedInUsers.push({ ...tempUser, connected: true });
+       } else {
+         // Si el usuario ya existe, actualizar el usuario existente en lugar de agregar uno nuevo
+         // Asegúrate de establecer el estado 'connected' a true
+         loggedInUsers[existingUserIndex] = {
+           ...loggedInUsers[existingUserIndex],
+           socketId: tempUser.socketId, // Actualizar el socketId
+           name: tempUser.name, // Actualizar el nombre si es necesario
+           connected: true, // Establecer el estado 'connected' a true
+         };
+       }
+       // Emitir la lista actualizada de usuarios conectados a todos los clientes
+       io.emit("currentUsers", loggedInUsers);
+       // Emitir un evento para notificar a todos los usuarios conectados que un usuario se ha conectado
+       io.emit("userConnected", tempUser);
     }
-  });
+   });
   // Manejar el evento de desconexión
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     // Encontrar el índice del usuario desconectado por socket.id
     const userIndex = loggedInUsers.findIndex(u => u.socketId === socket.id);
     if (userIndex !== -1) {
-      // Guardar el usuario desconectado antes de removerlo de la lista
-      const user = loggedInUsers[userIndex];
-      // Verificar que el usuario tenga un email
-      if (user && user.email) {
-        // Remover el usuario desconectado de la lista loggedInUsers
-        loggedInUsers.splice(userIndex,   1);
-        // Notificar a todos los usuarios conectados que un usuario se ha desconectado
-        io.emit("userDisconnected", user);
-        // Emitir la lista actualizada de usuarios conectados a todos los clientes
-        io.emit("currentUsers", loggedInUsers);
-        console.log(`User disconnected: ${user.email}`);
-      } else {
-        console.log("User object does not have an email property");
-      }
+       // Marcar el usuario como desconectado
+       loggedInUsers[userIndex].connected = false;
+       // Notificar a todos los usuarios conectados que un usuario se ha desconectado
+       io.emit("userDisconnected", loggedInUsers[userIndex]);
+       // Emitir la lista actualizada de usuarios conectados a todos los clientes
+       io.emit("currentUsers", loggedInUsers);
+       console.log(`User disconnected: ${loggedInUsers[userIndex].email}`);
     } else {
-      console.log("No user found to disconnect");
+       console.log("No user found to disconnect");
     }
-  });
-});
-
+   });
+ });
 
 
 
