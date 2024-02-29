@@ -22,9 +22,11 @@ const Chat = (props) => {
   const userEmail = location.state?.identifier;
   const authTokenFromLocation = location.state?.authToken;
   const { name } = location.state || {};
-  const { authToken, username: storedUsername } = useAuth();
+  const { authToken } = useAuth();
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [socketIdToUserMap, setSocketIdToUserMap] = useState({});
+  const [shouldConnect, setShouldConnect] = useState(false);
   let socket;
   
   const handleLogout = (email) => {
@@ -58,8 +60,8 @@ const Chat = (props) => {
         handleClose();
         navigate("/");
         
-        // Emitir el evento 'userDisconnected' al servidor
-        if (socket) { // Asegúrate de que socket esté definido antes de emitir
+        
+        if (socket) { 
           socket.emit("userDisconnected", { email: userEmail });
         }
       } else {
@@ -71,48 +73,67 @@ const Chat = (props) => {
   };
 
   useEffect(() => {
-    const socket = io("http://localhost:3001");
-    socket.emit("userConnected", { email: userEmail });
+    // Solo conectar si el nombre del usuario está definido
+    if (name) {
+      setShouldConnect(true);
+    }
+  }, [name]);
 
-    // Escucha el evento 'userConnected'
-    socket.on("userConnected", (user) => {
-      setLoggedInUsers((prevUsers) => {
-        const updatedUsers = [...prevUsers, user];
-        console.log("Usuario conectado:", user);
-        console.log("Lista actualizada de usuarios conectados:", updatedUsers);
-        return updatedUsers;
+  useEffect(() => {
+    if (shouldConnect) {
+      const socket = io("http://localhost:3001");
+
+      // Emitir el evento 'userConnected' con el nombre del usuario
+      socket.emit("userConnected", { email: userEmail, name: name });
+
+      // Escucha el evento 'userConnected'
+      socket.on("userConnected", (user) => {
+        setLoggedInUsers((prevUsers) => {
+          const updatedUsers = [...prevUsers, user];
+          console.log("Usuario conectado:", user);
+          console.log("Lista actualizada de usuarios conectados:", updatedUsers);
+          return updatedUsers;
+        });
+        // Actualiza el mapa de socketIds a nombres de usuarios
+        setSocketIdToUserMap((prevMap) => ({
+          ...prevMap,
+          [user.socketId]: user.name,
+        }));
       });
-    });
 
-    // Escucha el evento 'userDisconnected'
-    socket.on("userDisconnected", (user) => {
-      setLoggedInUsers((prevUsers) => {
-        const updatedUsers = prevUsers.filter((u) => u.email !== user.email);
-        console.log("Usuario desconectado:", user);
-        console.log("Lista actualizada de usuarios conectados:", updatedUsers);
-        return updatedUsers;
+      // Escucha el evento 'userDisconnected'
+      socket.on("userDisconnected", (user) => {
+        setLoggedInUsers((prevUsers) => {
+          const updatedUsers = prevUsers.filter((u) => u.socketId !== user.socketId);
+          console.log("Usuario desconectado:", user);
+          console.log("Lista actualizada de usuarios conectados:", updatedUsers);
+          return updatedUsers;
+        });
+        setSocketIdToUserMap((prevMap) => {
+          const newMap = { ...prevMap };
+          delete newMap[user.socketId];
+          return newMap;
+        });
       });
-    });
 
-    // Solicita la lista inicial de usuarios conectados al conectarse
-    socket.emit("getCurrentUsers");
+      // Solicita la lista inicial de usuarios conectados al conectarse
+      socket.emit("getCurrentUsers");
+      socket.on("currentUsers", (users) => {
+    
+        setLoggedInUsers(users);
+      });
 
-    // Escucha el evento 'currentUsers'
-    socket.on("currentUsers", (users) => {
-      setLoggedInUsers(users);
-      console.log("Lista inicial de usuarios conectados:", users);
-    });
-
-    // Limpia los listeners y desconecta el socket cuando el componente se desmonta
-    return () => {
-      if (socket) {
-        socket.off("userConnected");
-        socket.off("userDisconnected");
-        socket.off("currentUsers");
-        socket.disconnect();
-      }
-    };
-  }, [userEmail]);
+      // Limpia los listeners y desconecta el socket cuando el componente se desmonta
+      return () => {
+        if (socket) {
+          socket.off("userConnected");
+          socket.off("userDisconnected");
+          socket.off("currentUsers");
+          socket.disconnect();
+        }
+      };
+    }
+  }, [shouldConnect, userEmail, name]);
 
   const agregarAmigo = (newUsers) => {
     setLoggedInUsers(newUsers);
@@ -150,20 +171,18 @@ const Chat = (props) => {
         tuTokenDeAutenticacion={authToken || authTokenFromLocation}
       />
 
-      <ul>
-        {loggedInUsers
-          .filter((user) => user.name !== storedUsername)
-          .map((user) => (
-            <li key={user.email}>
-              {user.name}
-              <span style={{ color: user.connected ? "green" : "red" }}>
-                {" "}
-                ●{" "}
-              </span>
-            </li>
-          ))}
-      </ul>
-
+<ul>
+  {loggedInUsers
+    .filter((user) => user.socketId !== socket?.id)
+    .map((user) => (
+      <li key={user.socketId}>
+        {socketIdToUserMap[user.socketId] || 'Usuario desconocido'}
+        <span style={{ color: user.connected ? "green" : "red" }}>
+          ●
+        </span>
+      </li>
+    ))}
+</ul>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Confirmar Cierre de Sesión</DialogTitle>
         <DialogContent>
