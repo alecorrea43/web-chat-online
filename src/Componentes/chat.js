@@ -6,7 +6,7 @@ import {
   IconButton,
   Box,
   TextField,
-  InputAdornment
+  InputAdornment,
 } from "@mui/material";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -21,12 +21,13 @@ import SearchIcon from "@mui/icons-material/Search";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import "./styles/Chat.css";
 import io from "socket.io-client";
+import IndividualChat from "./individualChat";
 
 const Chat = (props) => {
   const [loggedInUsers, setLoggedInUsers] = useState([]);
   const [open, setOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-
+  const [selectedUser, setSelectedUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const userEmail = location.state?.identifier;
@@ -37,9 +38,13 @@ const Chat = (props) => {
   const handleClose = () => setOpen(false);
   const [socketIdToUserMap, setSocketIdToUserMap] = useState({});
   const [shouldConnect, setShouldConnect] = useState(false);
-  let socket;
   const [userConnectionStatus, setUserConnectionStatus] = useState({});
   const [searchText, setSearchText] = useState("");
+  const [socket, setSocket] = useState(null);
+
+  const handleUserClick = (userEmail) => {
+    setSelectedUser(userEmail);
+  };
 
   const handleLogout = (email) => {
     // Verifica si el correo electrónico del usuario está presente y si el usuario está en la lista de usuarios conectados
@@ -91,13 +96,15 @@ const Chat = (props) => {
   }, [name]);
   useEffect(() => {
     if (shouldConnect) {
-      const socket = io("http://localhost:3001");
+      const newSocket = io("http://localhost:3001");
+      setSocket(newSocket);
 
       // Emitir el evento 'userConnected' con el nombre del usuario
-      socket.emit("userConnected", { email: userEmail, name: name });
-
+      if (newSocket) {
+        newSocket.emit("userConnected", { email: userEmail, name: name });
+      }
       // Escucha el evento 'userConnected'
-      socket.on("userConnected", (user) => {
+      newSocket.on("userConnected", (user) => {
         setLoggedInUsers((prevUsers) => {
           const existingUserIndex = prevUsers.findIndex(
             (u) => u.email === user.email
@@ -135,7 +142,7 @@ const Chat = (props) => {
       });
 
       // Escucha el evento 'userDisconnected'
-      socket.on("userDisconnected", (user) => {
+      newSocket.on("userDisconnected", (user) => {
         setLoggedInUsers((prevUsers) => {
           const updatedUsers = prevUsers.filter(
             (u) => u.socketId !== user.socketId
@@ -160,8 +167,8 @@ const Chat = (props) => {
       });
 
       // Solicita la lista inicial de usuarios conectados al conectarse
-      socket.emit("getCurrentUsers");
-      socket.on("currentUsers", (users) => {
+      newSocket.emit("getCurrentUsers");
+      newSocket.on("currentUsers", (users) => {
         console.log("Lista inicial de usuarios conectados recibida:", users);
         setLoggedInUsers(users);
         const updatedSocketIdToUserMap = users.reduce((map, user) => {
@@ -180,11 +187,11 @@ const Chat = (props) => {
 
       // Limpia los listeners y desconecta el socket cuando el componente se desmonta
       return () => {
-        if (socket) {
-          socket.off("userConnected");
-          socket.off("userDisconnected");
-          socket.off("currentUsers");
-          socket.disconnect();
+        if (newSocket) {
+          newSocket.off("userConnected");
+          newSocket.off("userDisconnected");
+          newSocket.off("currentUsers");
+          newSocket.disconnect();
         }
       };
     }
@@ -215,31 +222,28 @@ const Chat = (props) => {
         </AppBar>
       </div>
       <div>
-      <Box
-      component="form"
-      noValidate
-    >
-      <TextField
-      id="filled-basic"
-        autoComplete="off"
-         className="buscador-usuario"
-          label="Buscar usuario"
-          variant="filled"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          fullWidth 
-          onFocus={() => setIsFocused(true)} 
-          onBlur={() => setIsFocused(false)} 
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-               {isFocused ? <ArrowForwardIcon /> : <SearchIcon />}
-              </InputAdornment>
-            ),
-          }}
-        />
-    </Box>
-  
+        <Box component="form" noValidate>
+          <TextField
+            id="filled-basic"
+            autoComplete="off"
+            className="buscador-usuario"
+            label="Buscar usuario"
+            variant="filled"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            fullWidth
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  {isFocused ? <ArrowForwardIcon /> : <SearchIcon />}
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
         <ul className="ul-sin-puntos">
           {loggedInUsers
             .filter(
@@ -248,7 +252,10 @@ const Chat = (props) => {
                 user.email.toLowerCase().includes(searchText.toLowerCase())
             )
             .map((user, index) => (
-              <li key={`${user.email}-${user.socketId}`}>
+              <li
+                key={`${user.email}-${user.socketId}`}
+                onClick={() => handleUserClick(user.email)}
+              >
                 <Box
                   sx={{
                     padding: "18px",
@@ -275,6 +282,13 @@ const Chat = (props) => {
               </li>
             ))}
         </ul>
+        {selectedUser && socket && (
+          <IndividualChat
+            userEmail={selectedUser}
+            socketIdToUserMap={socketIdToUserMap}
+            socket={socket}
+          />
+        )}
       </div>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Confirmar Cierre de Sesión</DialogTitle>

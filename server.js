@@ -14,7 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const http = require("http");
 const socketIo = require("socket.io");
-
+let emailToSocketIdMap = {};
 
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -44,6 +44,7 @@ io.on("connection", (socket) => {
    
     // Solo emitir el evento 'userConnected' si el nombre del usuario está disponible
     if (tempUser.name) {
+      emailToSocketIdMap[tempUser.email] = tempUser.socketId;
        // Verificar si el usuario ya está en la lista loggedInUsers por email
        const existingUserIndex = loggedInUsers.findIndex(u => u.email === tempUser.email);
        if (existingUserIndex === -1) {
@@ -64,6 +65,16 @@ io.on("connection", (socket) => {
        io.emit("currentUsers", loggedInUsers);
        // Emitir un evento para notificar a todos los usuarios conectados que un usuario se ha conectado
        io.emit("userConnected", tempUser);
+       socket.on('sendMessage', ({ message, userEmail }) => {
+        // Buscar el socketId del destinatario usando el mapa
+        const recipientSocketId = emailToSocketIdMap[userEmail];
+        if (recipientSocketId) {
+           // Enviar el mensaje al destinatario
+           io.to(recipientSocketId).emit('message', message);
+        } else {
+           console.log(`No se encontró el usuario con el correo electrónico: ${userEmail}`);
+        }
+       });
     }
    });
   // Manejar el evento de desconexión
