@@ -1,5 +1,3 @@
-// Login.js
-
 import videoBackground from "./image/1509404557.mp4";
 import "./styles/styles.css";
 import React, { useState, useEffect } from "react";

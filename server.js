@@ -1,3 +1,5 @@
+const Message = require('./src/Componentes/Message');
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -19,16 +21,16 @@ let emailToSocketIdMap = {};
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: 'http://localhost:3000', 
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['my-custom-header'],
-    credentials: true
-  }
-});
-
+     origin: 'http://localhost:3000', 
+     methods: ['GET', 'POST'],
+     allowedHeaders: ['my-custom-header'],
+     credentials: true
+  },
+  debug: true
+ });
 io.on("connection", (socket) => {
   console.log("New client connected");
- 
+  console.log('Socket conectado con ID:', socket.id);
   // Almacenar temporalmente el socketId y el email del usuario
   let tempUser = {
      socketId: socket.id,
@@ -38,13 +40,16 @@ io.on("connection", (socket) => {
  
   // Escuchar el evento 'userConnected'
   socket.on("userConnected", (userData) => {
+    console.log("Evento userConnected recibido:", userData);
     // Actualizar el nombre y el email del usuario temporal
     tempUser.name = userData.name;
     tempUser.email = userData.email;
+    tempUser.socketId = socket.id;
    
     // Solo emitir el evento 'userConnected' si el nombre del usuario está disponible
     if (tempUser.name) {
       emailToSocketIdMap[tempUser.email] = tempUser.socketId;
+      console.log(`Usuario conectado: ${tempUser.name} (${tempUser.email}), socketId: ${tempUser.socketId}`);
        // Verificar si el usuario ya está en la lista loggedInUsers por email
        const existingUserIndex = loggedInUsers.findIndex(u => u.email === tempUser.email);
        if (existingUserIndex === -1) {
@@ -63,20 +68,9 @@ io.on("connection", (socket) => {
        }
        // Emitir la lista actualizada de usuarios conectados a todos los clientes
        io.emit("currentUsers", loggedInUsers);
-       // Emitir un evento para notificar a todos los usuarios conectados que un usuario se ha conectado
-       io.emit("userConnected", tempUser);
-       socket.on('sendMessage', ({ message, userEmail }) => {
-        // Buscar el socketId del destinatario usando el mapa
-        const recipientSocketId = emailToSocketIdMap[userEmail];
-        if (recipientSocketId) {
-           // Enviar el mensaje al destinatario
-           io.to(recipientSocketId).emit('message', message);
-        } else {
-           console.log(`No se encontró el usuario con el correo electrónico: ${userEmail}`);
-        }
-       });
     }
    });
+  
   // Manejar el evento de desconexión
   socket.on("disconnect", () => {
     console.log("Client disconnected");
@@ -85,18 +79,68 @@ io.on("connection", (socket) => {
     if (userIndex !== -1) {
        // Marcar el usuario como desconectado
        loggedInUsers[userIndex].connected = false;
+
+       delete emailToSocketIdMap[loggedInUsers[userIndex].email];
+
+       console.log(`Usuario desconectado: ${loggedInUsers[userIndex].email}, eliminado del mapa`);
        // Notificar a todos los usuarios conectados que un usuario se ha desconectado
        io.emit("userDisconnected", loggedInUsers[userIndex]);
        // Emitir la lista actualizada de usuarios conectados a todos los clientes
        io.emit("currentUsers", loggedInUsers);
-       console.log(`User disconnected: ${loggedInUsers[userIndex].email}`);
     } else {
        console.log("No user found to disconnect");
     }
    });
- });
-
-
+   socket.on('sendMessage', async ({ message, recipientSocketId, senderName, senderEmail }) => {
+    console.log("Evento 'sendMessage' recibido en el servidor:", message, recipientSocketId);
+    console.log('Mensaje recibido:', message);
+    console.log('Nombre del remitente:', senderName);
+    console.log('Email del remitente:', senderEmail); // Depuración: Verifica el email del remitente
+  
+    try {
+        // Buscar al usuario destinatario en la lista de usuarios conectados
+        const recipientUser = loggedInUsers.find(user => user.socketId === recipientSocketId);
+    
+        if (recipientUser) {
+            console.log(`Enviando el mensaje ${message} a: ${recipientUser.email} con socketId: ${recipientSocketId}`);
+        
+            // Asignar el conversationId, que puede ser el ID del chat o cualquier identificador único de la conversación
+            const conversationId = generateConversationId(senderEmail, recipientUser.email); // Implementa tu lógica para generar el conversationId
+            console.log("ConversationId asignado al mensaje:", conversationId);
+            // Guardar el mensaje en la base de datos con el conversationId asignado
+            const newMessage = new Message({
+                sender: senderName,
+                recipient: recipientUser.email,
+                text: message,
+                conversationId: conversationId, // Asigna el conversationId aquí
+            });
+            await newMessage.save();
+        
+            console.log("Mensaje guardado en la base de datos:", newMessage);
+        
+            // Emitir el mensaje al destinatario
+            io.to(recipientSocketId).emit('message', {
+                sender: senderName,
+                recipientEmail: recipientUser.email,
+                text: message,
+                senderName: senderName,
+                conversationId: conversationId,
+            });
+        
+            console.log("Mensaje enviado al destinatario");
+        
+            // Emitir confirmación al remitente
+            socket.emit('messageSent', { message: 'Mensaje enviado', sender: 'Server' });
+        } else {
+            console.log(`El destinatario con socketId: ${recipientSocketId} no está conectado.`);
+            socket.emit('messageError', { message: 'El destinatario no está conectado', sender: 'Server' });
+        }
+    } catch (error) {
+        console.error("Error al enviar el mensaje:", error);
+        socket.emit('messageError', { message: 'Error al enviar el mensaje', sender: 'Server' });
+    }
+});
+});
 
 
 // Configuración de CORS
@@ -161,8 +205,27 @@ app.post("/register", async (req, res) => {
   }
 });
 
+function generateConversationId(user1, user2) {
+  // Ordena los correos electrónicos de manera alfabética para asegurar consistencia
+  const sortedEmails = [user1, user2].sort();
+  // Concatena los correos electrónicos para formar un identificador único
+  const conversationId = sortedEmails.join('_');
+  return conversationId;
+}
+// Lógica para guardar un nuevo mensaje
+app.get("/messages/:conversationId", async (req, res) => {
+  const { conversationId } = req.params;
 
+  try {
+    // Buscar mensajes en la base de datos usando el conversationId
+    const messages = await Message.find({ conversationId });
 
+    res.status(200).json({ messages });
+  } catch (error) {
+    console.error("Error al cargar los mensajes:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
 // Ruta de inicio de sesión
 app.post("/login", async (req, res) => {
 
@@ -187,7 +250,7 @@ app.post("/login", async (req, res) => {
         const token = jwt.sign(
           { username: user.name, email: user.email },
           process.env.JWT_SECRET,
-          { expiresIn: "1h" }
+          { expiresIn: "24h" }
         );
         
 

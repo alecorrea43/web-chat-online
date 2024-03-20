@@ -290,7 +290,7 @@ const Register = () => {
             Registrarse
           </Button>
           <StyledTypography variant="body2">
-            ¿Ya tienes una cuenta? <Link to="/">Iniciar Sesión</Link>
+            ¿Ya tienes una cuenta? <Link to="/login">Iniciar Sesión</Link>
           </StyledTypography>
         </StyledFormContainerBox>
       </StyledFormContainer>

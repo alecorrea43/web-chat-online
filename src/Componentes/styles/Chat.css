@@ -1,20 +1,59 @@
-
 .appbar1 {
   background-color: black !important; 
 }
-.userName{
+
+.userName {
   color: white !important;
 }
+
 .ul-sin-puntos {
   list-style-type: none;
   padding-left: 0;
   margin: 0px;
- }
- .caja-padre{
-  height: 100vh;
- }
- .buscador-usuario .MuiOutlinedInput-root {
-  border-radius: 0;
+}
 
- }
- 
+.caja-padre {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.contenedor-cajas {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+
+
+.buscador-usuario .MuiOutlinedInput-root {
+  border-radius: 0;
+}
+
+
+.caja-buscador-lista {
+  flex: 1;
+  overflow-y: auto;
+}
+.cajaja-contenedora-3{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+} 
+.caja-chat {
+  flex: 1;
+  overflow-y: auto;
+}
+.caja-input-buton{
+  display: flex;
+}
+
+#message-input {
+  margin-top: auto; /* Coloca el input y el botón siempre al final */
+}
+
+Button {
+  margin-top: 8px; /* Espaciado entre el input y el botón */
+}
