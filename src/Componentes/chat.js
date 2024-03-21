@@ -21,6 +21,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import "./styles/Chat.css";
 import io from "socket.io-client";
 import { useAuth } from "./AuthContext";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const Chat = (props) => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -79,7 +80,12 @@ const Chat = (props) => {
         if (response.ok) {
           const data = await response.json();
           console.log("Data:", data); // Depuración: Verifica los datos recibidos del servidor
-          setMessages(data.messages);
+          // Asegúrate de que 'name' es el nombre del usuario actual
+          const messagesWithSenderInfo = data.messages.map((message) => ({
+            ...message,
+            isSender: message.sender === name, // Establece 'isSender' basado en si el 'sender' coincide con el 'name' del usuario actual
+          }));
+          setMessages(messagesWithSenderInfo);
           setActiveConversation(conversationId); // Actualiza el estado de mensajes con los mensajes recibidos
         } else {
           console.error("Error al cargar los mensajes:", response.statusText);
@@ -218,10 +224,11 @@ const Chat = (props) => {
             "Actualizando mensajes para la conversación activa:",
             activeConversation
           );
+          const isSender = message.sender === name;
           // Actualizar el estado de mensajes localmente
           setMessages((prevMessages) => [
             ...prevMessages,
-            { ...message, senderName },
+            { ...message, senderName, isSender },
           ]);
         } else {
           console.log(
@@ -271,6 +278,7 @@ const Chat = (props) => {
           sender: userEmail,
           text: message,
           conversationId: activeConversation,
+          isSender: true,
         };
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       } else {
@@ -299,13 +307,15 @@ const Chat = (props) => {
       </AppBar>
       <div className="contenedor-cajas">
         <div className="caja-buscador-lista">
+          <div className="caja-superior">
           <Box component="form" noValidate>
             <TextField
-              id="filled-basic"
+              id="standard-basic"
+              variant="standard"
               autoComplete="off"
               className="buscador-usuario"
               label="Buscar usuario"
-              variant="filled"
+            
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               fullWidth
@@ -320,7 +330,7 @@ const Chat = (props) => {
               }}
             />
           </Box>
-
+          </div>
           <ul className="ul-sin-puntos">
             {loggedInUsers
               .filter(
@@ -361,7 +371,22 @@ const Chat = (props) => {
           </ul>
         </div>
         <div className="cajaja-contenedora-3">
-        <div className="caja-chat">
+          {selectedUser && (
+            <div className="usuario-seleccionado">
+              <Typography
+                variant="h6"
+                component="div"
+                style={{ paddingLeft: "30px" }}
+              >
+                {loggedInUsers.find((user) => user.email === selectedUser)
+                  ?.name || "Usuario desconocido"}
+              </Typography>
+              <IconButton color="inherit" style={{ marginRight: "25px" }}>
+                <MoreVertIcon />
+              </IconButton>
+            </div>
+          )}
+          <div className="caja-chat">
             {selectedUser && (
               <>
                 {messages
@@ -371,17 +396,11 @@ const Chat = (props) => {
                       key={index}
                       variant="body1"
                       component="div"
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: message.sender === userEmail ? "flex-end" : "flex-start",
-                        backgroundColor: message.sender === userEmail ? "lightgreen" : "lightblue",
-                        margin: "5px",
-                        padding: "5px",
-                        borderRadius: "10px",
-                      }}
+                      className={
+                        message.isSender ? "message-sender" : "message-received"
+                      }
                     >
-                      <strong>{message.sender}:</strong> {message.text}
+                      <strong></strong> {message.text}
                     </Typography>
                   ))}
               </>
@@ -390,16 +409,32 @@ const Chat = (props) => {
           {selectedUser && (
             <div className="caja-input-buton">
               <TextField
-                id="message-input"
-                label="Escribe un mensaje"
-                variant="outlined"
+                id="filled-basic"
+                label="Escribir mensaje"
+                variant="filled"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                fullWidth
+                fullWidth// Estilo para quitar el borde y bordes redondeados
               />
-              <Button variant="contained" color="primary" onClick={sendMessage}>
-                Enviar
-              </Button>
+              <Button
+              
+      variant="contained"
+      
+      onClick={sendMessage}
+      style={{
+        borderTopRightRadius: '4px', // Border radius solo en la esquina superior derecha
+        borderBottomRightRadius: '0', // Sin border radius en la esquina inferior derecha
+        borderTopLeftRadius: '0', // Sin border radius en la esquina superior izquierda
+        borderBottomLeftRadius: '0', // Sin border radius en la esquina inferior izquierda
+        border: 'none', // Quitar el borde
+        background: "#000",
+       color:"white",
+       fontWeight:'bold'
+        
+      }}
+    >
+      Enviar
+    </Button>
             </div>
           )}
         </div>

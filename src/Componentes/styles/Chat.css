@@ -1,5 +1,5 @@
 .appbar1 {
-  background-color: black !important; 
+  background-color:black !important; 
 }
 
 .userName {
@@ -31,10 +31,19 @@
   border-radius: 0;
 }
 
+.buscador-usuario{
+  background-color: #60d4ea;
+}
+.caja-superior{
+  padding: 13px;
+  background-color: #60d4ea;
+}
+
 
 .caja-buscador-lista {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto; 
+  background-color: red;
 }
 .cajaja-contenedora-3{
   display: flex;
@@ -43,17 +52,41 @@
   overflow: hidden;
 } 
 .caja-chat {
-  flex: 1;
+  flex: 3;
   overflow-y: auto;
 }
 .caja-input-buton{
   display: flex;
+  background-color: #60d4ea;
+  padding: 13px;
+}
+#filled-basic{
+  color: rgb(0, 0, 0) !important;
+border-bottom: #000000 solid 2px !important;
+height: 11px;
+
 }
 
-#message-input {
-  margin-top: auto; /* Coloca el input y el botón siempre al final */
+
+.message-sender {
+  text-align: right;
+  background-color: green;
 }
 
-Button {
-  margin-top: 8px; /* Espaciado entre el input y el botón */
+/* Estilos para mensajes recibidos */
+.message-received {
+  text-align: left;
+  background-color: blue;
+}
+.usuario-seleccionado{
+  background-color:#60d4ea;
+  color: #000000;
+  border: 0;
+  box-sizing: content-box; 
+  height: 56px;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+justify-content: space-between;
+align-items: center;
 }
