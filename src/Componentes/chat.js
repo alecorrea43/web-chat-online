@@ -249,7 +249,7 @@ const Chat = (props) => {
         console.log("Actualizando activeConversation a:", conversationId);
         setActiveConversation(conversationId);
         const response = await fetch(
-          `https://app.netlify.com/sites/web-chat-online/server.js`,
+          `http://localhost:3001/messages/${conversationId}`,
           {
             method: "GET",
             headers: {
@@ -317,7 +317,7 @@ const Chat = (props) => {
     try {
       const token = authToken || authTokenFromLocation;
       console.log("Token de autenticación:", token);
-      const response = await fetch("https://app.netlify.com/sites/web-chat-online/server.js", {
+      const response = await fetch("http://localhost:3001/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -351,7 +351,7 @@ const Chat = (props) => {
 
   useEffect(() => {
     if (shouldConnect) {
-      const newSocket = io("https://app.netlify.com/sites/web-chat-online/server.js");
+      const newSocket = io("http://localhost:3001");
       setSocket(newSocket);
 
       if (newSocket) {
