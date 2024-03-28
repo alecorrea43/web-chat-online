@@ -131,7 +131,7 @@ const Login = () => {
     try {
       setIdentifierError("");
 
-      const response = await fetch("http://localhost:3001/login", {
+      const response = await fetch("https://app.netlify.com/sites/web-chat-online/server.js", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -147,7 +147,7 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(data.error || "Error en la solicitud");
       }
-      const socket = io("http://localhost:3001");
+      const socket = io("https://app.netlify.com/sites/web-chat-online/server.js");
       socket.emit("userConnected", { email: data.email });
       setError("");
 

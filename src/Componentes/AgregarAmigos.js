@@ -16,7 +16,7 @@ const AgregarAmigos = ({ agregarAmigo, tuTokenDeAutenticacion }) => {
   const handleAgregarAmigo = async () => {
     try {
 
-      const response = await fetch("http://localhost:3001/agregar-amigo", {
+      const response = await fetch("https://app.netlify.com/sites/web-chat-online/server.js", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
