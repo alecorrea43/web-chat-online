@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const User = require("/src/Componentes/User"); // Importa el modelo de usuario si lo tienes
+const User = require("./Componentes/User"); // Importa el modelo de usuario si lo tienes
 
 exports.handler = async (event, context) => {
   const { name, email, password } = JSON.parse(event.body);
