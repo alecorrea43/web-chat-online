@@ -1,4 +1,4 @@
-const Message = require('./src/Componentes/Message');
+
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -17,6 +17,8 @@ const PORT = process.env.PORT || 3001;
 const http = require("http");
 const socketIo = require("socket.io");
 let emailToSocketIdMap = {};
+const Message = require('./src/Componentes/Message');
+
 
 const server = http.createServer(app);
 const io = socketIo(server, {
