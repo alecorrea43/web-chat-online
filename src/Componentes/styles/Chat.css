@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+
 .appbar1 {
-  background-color:black !important; 
+  background-color:#10100F !important; 
 }
 
 .userName {
@@ -16,70 +18,119 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden;
+  overflow: hidden; 
+  background-color: #222;
+  
 }
 
 .contenedor-cajas {
   display: flex;
   flex: 1;
   overflow: hidden;
+
 }
 
 
 
-.buscador-usuario .MuiOutlinedInput-root {
-  border-radius: 0;
-}
-
-.buscador-usuario{
-  background-color: #60d4ea;
-}
-.caja-superior{
-  padding: 13px;
-  background-color: #60d4ea;
-}
-
+.caja-superior {
+  background-color: #88C2CE;
+height: 56px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Agrega un efecto de hover clarito */
+  transition: background-color 0.3s ease; /* Suaviza el cambio de color */
+ }
+ 
+ .caja-superior:hover {
+  background-color: #80e8f5; /* Ajusta este valor para el color clarito deseado */
+ }
+ 
 
 .caja-buscador-lista {
   flex: 1;
-  overflow-y: auto; 
-  background-color: red;
+  height: 100%;
+  color: #ffffff;
+  background-color: #222;
+  border-right: 1px solid #171717;
+
 }
-.cajaja-contenedora-3{
+
+.caja-contenedor-3{
   display: flex;
   flex-direction: column;
-  flex: 1;
-  overflow: hidden;
-} 
-.caja-chat {
-  flex: 3;
-  overflow-y: auto;
+  flex: 2;
+  max-height: 100%;
 }
+
+.caja-chat {
+flex: 3;
+overflow-y: auto;
+background-color: #222;
+padding-right: 20px;
+padding-left:20px ;
+padding-top: 4px;
+height: 100%;
+padding-bottom: 10px;
+
+ }
+
+ 
+ .message-sender-container,
+.message-received-container {
+ display: flex;
+ justify-content: flex-end; /* Alinea el contenido a la derecha para los mensajes enviados */
+ 
+}
+
+.message-received-container {
+ justify-content: flex-start; /* Alinea el contenido a la izquierda para los mensajes recibidos */
+}
+
+ .message-sender {
+  text-align: right;
+  padding: 6px;
+  background-color: #80e8f5;
+  border-radius: 10px;
+color: #000000;
+ }
+ 
+ .message-received {
+  text-align: left;
+  background-color:#10100F ;
+  padding: 6px;
+  border-radius: 10px;
+  color: #ffffff;
+ }
+ .timestamp{
+  font-size: 10px;
+  display: block;
+ text-align: right;
+ }
+
 .caja-input-buton{
   display: flex;
-  background-color: #60d4ea;
-  padding: 13px;
+padding: 3px;
+background-color: #88C2CE;
+height: 50px;
 }
-#filled-basic{
-  color: rgb(0, 0, 0) !important;
-border-bottom: #000000 solid 2px !important;
-height: 11px;
+
+
+.message-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #222;
+  color: #fff;
 
 }
 
 
-.message-sender {
-  text-align: right;
-  background-color: green;
-}
-
-/* Estilos para mensajes recibidos */
-.message-received {
-  text-align: left;
-  background-color: blue;
-}
 .usuario-seleccionado{
-  background-color:#60d4ea;
+  background-color:#88C2CE;
   color: #000000;
   border: 0;
   box-sizing: content-box; 
@@ -90,3 +141,13 @@ height: 11px;
 justify-content: space-between;
 align-items: center;
 }
+@media (min-width: 641px) {
+  .usuario-seleccionado{
+     height: 56px;
+  }
+ }
+ @media (max-width: 641px) {
+  .usuario-seleccionado{
+     height: 56px;
+  }
+ }

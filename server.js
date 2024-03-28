@@ -125,6 +125,7 @@ io.on("connection", (socket) => {
                 text: message,
                 senderName: senderName,
                 conversationId: conversationId,
+                createdAt: new Date().toISOString(),
             });
         
             console.log("Mensaje enviado al destinatario");
@@ -421,6 +422,8 @@ async function checkExistingRequest(email) {
     throw new Error("Error al verificar la solicitud existente.");
   }
 }
+
+
 
 // Modificación en app.post('/reset-password', ...)
 app

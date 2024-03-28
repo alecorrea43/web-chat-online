@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Typography,
   AppBar,
   Toolbar,
   IconButton,
   Box,
-  TextField,
   InputAdornment,
   Button,
   Dialog,
@@ -13,6 +12,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  ListItemText,
+  List,
+  ListItem,
+  Badge,
+  Link,
 } from "@mui/material";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -22,6 +26,97 @@ import "./styles/Chat.css";
 import io from "socket.io-client";
 import { useAuth } from "./AuthContext";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { styled } from "@mui/material/styles";
+import InputBase from "@mui/material/InputBase";
+import SendIcon from "@mui/icons-material/Send";
+import MessageIcon from "@mui/icons-material/Message";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+
+
+const StyledInput = styled(InputBase)(({ theme }) => ({
+  "& .MuiInputBase-input": {
+    position: "relative",
+    fontSize: 16,
+    width: "100%",
+    transition: theme.transitions.create([
+      "border-color",
+      "background-color",
+      "box-shadow",
+    ]),
+    fontFamily: [
+      "-apple-system",
+      "BlinkMacSystemFont",
+      '"Segoe UI"',
+      "Roboto",
+      '"Helvetica Neue"',
+      "Arial",
+      "sans-serif",
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(","),
+
+    "&::placeholder": {
+      color: "rgba(0, 0, 0, 0.70)", // Aplica el color rgba(0, 0, 0, 0.54) al placeholder
+      opacity: 1, // Asegura que el placeholder sea visible
+    },
+  },
+}));
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    backgroundColor: "#80e8f5", // Cambia el color de fondo a negro
+    color: "#000", // Cambia el color del texto a blanco
+    marginRight: "9px",
+  },
+}));
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  borderTopRightRadius: "0",
+  borderBottomRightRadius: "0",
+  borderTopLeftRadius: "0",
+  borderBottomLeftRadius: "0",
+  border: "none",
+  color: "#000",
+  fontWeight: "bold",
+  padding: "0 30px",
+  "&:hover": {
+    color: "#80e8f5", // Cambia el color del ícono a gris claro al pasar el mouse
+    backgroundColor:'#88C2CE',
+  },
+  "& .MuiSvgIcon-root": {
+    transition: theme.transitions.create("color", {
+      duration: theme.transitions.duration.shortest,
+    }),
+  },
+}));
+
+
+
+
+const StyledListItem = styled(ListItem)(({ theme }) => ({
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.2)", // Usa el color de hover predeterminado de Material-UI
+    // Añade un efecto de oscurecimiento más fuerte
+  },
+}));
+const ChatBox = ({ selectedUser, children }) => {
+  // Usa selectedUser para alguna lógica condicional aquí
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "stretch",
+        wordBreak: "break-word",
+      }}
+    >
+      {children}
+    </Box>
+  );
+};
+const StyledMessageIcon = styled(MessageIcon)({
+  fontSize: 120, // Ajusta el tamaño del icono
+  color: "white", // Cambia el color del icono
+});
 
 const Chat = (props) => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -43,11 +138,99 @@ const Chat = (props) => {
   const [searchText, setSearchText] = useState("");
   const [socket, setSocket] = useState(null);
   const [activeConversation, setActiveConversation] = useState(null);
+  const [unreadMessages, setUnreadMessages] = useState({});
+  const [noResultsMessage, setNoResultsMessage] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [elementWidth, setElementWidth] = useState(null);
+  const [isBuscadorListaVisible, setIsBuscadorListaVisible] = useState(true);
+  const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
+
+  const contenedorCajasRef = useRef(null);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentRect.width;
+        if (width >= 641) {
+          // Si el ancho es mayor o igual a 641px, ambos contenedores deben ser visibles
+          setIsBuscadorListaVisible(true);
+          setIsContenedor3Visible(true);
+        } else {
+          // Si el ancho es menor a 641px, solo caja-buscador-lista debe ser visible
+          setIsBuscadorListaVisible(true);
+          setIsContenedor3Visible(false);
+        }
+      }
+    });
+
+    if (contenedorCajasRef.current) {
+      resizeObserver.observe(contenedorCajasRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentBoxSize[0].inlineSize;
+        setElementWidth(width); // Utiliza la función de estado para actualizar el estado con el nuevo ancho
+      }
+    });
+
+    const divElem = document.querySelector("body > div");
+    resizeObserver.observe(divElem);
+
+    return () => {
+      resizeObserver.disconnect(); // Desconecta el ResizeObserver al desmontar el componente
+    };
+  }, []);
+
+  useEffect(() => {
+    // Verifica si hay usuarios en la lista
+    if (loggedInUsers.length === 0) {
+      // Si no hay usuarios, no muestres el mensaje de "No se encontraron resultados"
+      setNoResultsMessage("");
+      setIsVisible(false);
+      return;
+    }
+    if (searchText) {
+      const filteredUsers = loggedInUsers.filter(
+        (user) =>
+          user.email !== userEmail && // Excluye al usuario actual
+          (user.name.toLowerCase().includes(searchText.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchText.toLowerCase()))
+      );
+
+      if (filteredUsers.length === 0) {
+        // Muestra el mensaje de "No se encontraron resultados" solo si hay usuarios y no hay resultados de búsqueda
+        setNoResultsMessage('"No se encontraron resultados"');
+        setIsVisible(true);
+        // Establece un temporizador para ocultar el mensaje después de 3 segundos
+        const timer = setTimeout(() => {
+          setIsVisible(false);
+        }, 2300);
+        return () => clearTimeout(timer); // Limpia el temporizador si el componente se desmonta antes de que el temporizador termine
+      } else {
+        // Oculta el mensaje de "No se encontraron resultados" si hay resultados de búsqueda
+        setNoResultsMessage("");
+        setIsVisible(false);
+      }
+    } else {
+      // Si el usuario no ha realizado una búsqueda, no muestres el mensaje de "No se encontraron resultados"
+      setNoResultsMessage("");
+      setIsVisible(false);
+    }
+  }, [searchText, loggedInUsers, userEmail]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleUserClick = async (selectedUserEmail) => {
+    setLoading(true);
     console.log("Selected User Email:", selectedUserEmail); // Depuración: Verifica el correo electrónico del usuario seleccionado
     console.log("User Email:", userEmail); // Depuración: Verifica el correo electrónico del usuario actual
 
@@ -98,7 +281,28 @@ const Chat = (props) => {
         "El correo electrónico del usuario seleccionado es inválido"
       );
     }
+
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Simula un retraso
+    setLoading(false);
+
+    if (window.innerWidth < 641) {
+      setIsBuscadorListaVisible(false);
+      setIsContenedor3Visible(true);
+    }
   };
+
+  const lastMessageRef = useRef(null);
+  useEffect(() => {
+    const scrollToLastMessage = () => {
+      if (lastMessageRef.current) {
+        lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+
+    // Espera un poco para asegurarte de que el contenedor se haya renderizado completamente
+    setTimeout(scrollToLastMessage, 10);
+  }, [messages, loading]);
+
   const handleLogout = (email) => {
     if (email && loggedInUsers.some((user) => user.email === email)) {
       handleOpen();
@@ -215,6 +419,11 @@ const Chat = (props) => {
       });
       newSocket.on("message", (message) => {
         console.log("Mensaje recibido:", message);
+
+        if (!message.createdAt) {
+          console.error("Timestamp is undefined");
+          return; // Evita continuar si 'createdAt' es undefined
+        }
         const senderName = message.senderName || "Remitente desconocido";
         console.log("Nombre del remitente:", senderName);
 
@@ -237,6 +446,16 @@ const Chat = (props) => {
             "Conversation activa:",
             activeConversation
           );
+          // Actualizar el estado de mensajes no leídos
+          setUnreadMessages((prevUnreadMessages) => {
+            const updatedUnreadMessages = { ...prevUnreadMessages };
+            if (updatedUnreadMessages[message.conversationId]) {
+              updatedUnreadMessages[message.conversationId] += 1;
+            } else {
+              updatedUnreadMessages[message.conversationId] = 1;
+            }
+            return updatedUnreadMessages;
+          });
         }
       });
 
@@ -279,6 +498,7 @@ const Chat = (props) => {
           text: message,
           conversationId: activeConversation,
           isSender: true,
+          createdAt: new Date(),
         };
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       } else {
@@ -287,6 +507,42 @@ const Chat = (props) => {
     }
   };
   console.log("Estado de mensajes:", messages);
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) {
+      console.error("Timestamp is undefined");
+      return "Invalid Date";
+    }
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        console.error("Invalid timestamp:", timestamp);
+        return "Invalid Date";
+      }
+      // Obtén la hora en formato de 24 horas
+      const hours24 = date.getHours();
+      // Determina si es AM o PM
+      const period = hours24 >= 12 ? "P.M" : "A.M";
+      // Ajusta la hora para el formato de 12 horas si es mayor o igual a 13
+      // Pero para el rango de 1 a 24, simplemente usamos la hora directamente
+      const formattedHours = hours24;
+      // Formatea la hora y el minuto
+      const formattedTime = `${formattedHours
+        .toString()
+        .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+      // Devuelve la hora con el indicador AM/PM
+      return `${formattedTime} ${period}`;
+    } catch (error) {
+      console.error("Error formatting timestamp:", error);
+      return "Invalid Date";
+    }
+  };
+
+  const handleBackToUserList = () => {
+    setSelectedUser(null);
+    setIsBuscadorListaVisible(true);
+    setIsContenedor3Visible(false);
+  };
+  
   return (
     <div className="caja-padre">
       <AppBar position="static" className="appbar1">
@@ -305,139 +561,300 @@ const Chat = (props) => {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <div className="contenedor-cajas">
-        <div className="caja-buscador-lista">
-          <div className="caja-superior">
-          <Box component="form" noValidate>
-            <TextField
-              id="standard-basic"
-              variant="standard"
-              autoComplete="off"
-              className="buscador-usuario"
-              label="Buscar usuario"
-            
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              fullWidth
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    {isFocused ? <ArrowForwardIcon /> : <SearchIcon />}
-                  </InputAdornment>
-                ),
+
+      <div className="contenedor-cajas" ref={contenedorCajasRef}>
+        {isBuscadorListaVisible && (
+          <div className="caja-buscador-lista">
+            <div className="caja-superior">
+              <Box
+                component="form"
+                noValidate
+                sx={{ width: "100%", height: "100%", display: "flex" }}
+              >
+                <StyledInput
+                  autoComplete="off"
+                  placeholder="Buscar usuario"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  fullWidth
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault(); // Previene la acción predeterminada de Enter
+                    }
+                  }}
+                  sx={{ paddingLeft: "13px", paddingRight: "13px" }}
+                  endAdornment={
+                    // Utiliza la prop endAdornment para agregar el icono al final del input
+                    <InputAdornment position="end">
+                      {isFocused ? <ArrowForwardIcon /> : <SearchIcon />}
+                    </InputAdornment>
+                  }
+                />
+              </Box>
+            </div>
+
+            <List
+              sx={{
+                paddingBottom: "0",
+                paddingTop: "0",
+                maxHeight: "100%",
+                overflowY: "auto",
               }}
-            />
-          </Box>
-          </div>
-          <ul className="ul-sin-puntos">
-            {loggedInUsers
-              .filter(
-                (user) =>
-                  user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-                  user.email.toLowerCase().includes(searchText.toLowerCase())
-              )
-              .map((user, index) => (
-                <li
-                  key={`${user.email}-${user.socketId}`}
-                  onClick={() => handleUserClick(user.email)}
-                >
-                  <Box
-                    sx={{
-                      padding: "18px",
-                      borderTop: "1px solid #ccc",
-                      borderLeft: "1px solid #ccc",
-                      borderRight: "1px solid #ccc",
-                      borderBottom:
-                        index === loggedInUsers.length - 1
-                          ? "1px solid #ccc"
-                          : "none",
-                    }}
-                  >
-                    {socketIdToUserMap[user.socketId] || "Usuario desconocido"}
-                    <span
-                      style={{
-                        color: userConnectionStatus[user.socketId]
-                          ? "green"
-                          : "red",
+            >
+              {loggedInUsers
+                .filter(
+                  (user) =>
+                    user.email !== userEmail && // Excluye al usuario actual
+                    (user.name
+                      .toLowerCase()
+                      .includes(searchText.toLowerCase()) ||
+                      user.email
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase()))
+                )
+                .map((user, index) => {
+                  const conversationId = generateConversationId(
+                    userEmail,
+                    user.email
+                  );
+                  return (
+                    <StyledListItem
+                      key={`${user.email}-${user.socketId}`}
+                      button
+                      onClick={() => {
+                        handleUserClick(user.email);
+                        setUnreadMessages((prevUnreadMessages) => {
+                          const updatedUnreadMessages = {
+                            ...prevUnreadMessages,
+                          };
+                          updatedUnreadMessages[conversationId] = 0; // Restablecer a 0
+                          return updatedUnreadMessages;
+                        });
                       }}
                     >
-                      ●
-                    </span>
-                  </Box>
-                </li>
-              ))}
-          </ul>
-        </div>
-        <div className="cajaja-contenedora-3">
-          {selectedUser && (
-            <div className="usuario-seleccionado">
-              <Typography
-                variant="h6"
-                component="div"
-                style={{ paddingLeft: "30px" }}
+                      <span
+                        style={{
+                          color: userConnectionStatus[user.socketId]
+                            ? "green"
+                            : "gray",
+                          paddingRight: "5px",
+                        }}
+                      >
+                        ●
+                      </span>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                          height: "60px",
+                        }}
+                      >
+                        <span>
+                          {socketIdToUserMap[user.socketId] ||
+                            "Usuario desconocido"}
+                        </span>
+                        {unreadMessages[conversationId] > 0 && (
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "flex-end",
+                              alignItems: "center",
+                              width: "100%",
+                            }}
+                          >
+                            <StyledBadge
+                              badgeContent={unreadMessages[conversationId]}
+                            ></StyledBadge>
+                          </div>
+                        )}
+                      </div>
+                    </StyledListItem>
+                  );
+                })}
+            </List>
+            {noResultsMessage && (
+              <ListItem
+                sx={{
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? "translateY(0)" : "translateY(100%)",
+                  transition: "opacity 0.5s ease, transform 0.5s ease",
+                }}
               >
-                {loggedInUsers.find((user) => user.email === selectedUser)
-                  ?.name || "Usuario desconocido"}
-              </Typography>
-              <IconButton color="inherit" style={{ marginRight: "25px" }}>
-                <MoreVertIcon />
-              </IconButton>
-            </div>
-          )}
-          <div className="caja-chat">
-            {selectedUser && (
-              <>
-                {messages
-                  .filter((msg) => msg.conversationId === activeConversation)
-                  .map((message, index) => (
-                    <Typography
-                      key={index}
-                      variant="body1"
-                      component="div"
-                      className={
-                        message.isSender ? "message-sender" : "message-received"
-                      }
-                    >
-                      <strong></strong> {message.text}
-                    </Typography>
-                  ))}
-              </>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center", // Centra el contenido horizontalmente
+                    alignItems: "center", // Centra el contenido verticalmente
+                    width: "100%", // Asegura que el Box ocupe todo el ancho disponible
+                    padding: "10px", // Agrega padding alrededor del contenido
+                    backgroundColor: "rgba(0, 0, 0, 0.5)", // Establece el fondo en negro
+                    color: "white", // Establece el color del texto en blanco para mejorar la legibilidad
+                    textAlign: "center",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <ListItemText primary={noResultsMessage} />
+                </Box>
+              </ListItem>
             )}
           </div>
-          {selectedUser && (
-            <div className="caja-input-buton">
-              <TextField
-                id="filled-basic"
-                label="Escribir mensaje"
-                variant="filled"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                fullWidth// Estilo para quitar el borde y bordes redondeados
-              />
-              <Button
-              
-      variant="contained"
-      
-      onClick={sendMessage}
-      style={{
-        borderTopRightRadius: '4px', // Border radius solo en la esquina superior derecha
-        borderBottomRightRadius: '0', // Sin border radius en la esquina inferior derecha
-        borderTopLeftRadius: '0', // Sin border radius en la esquina superior izquierda
-        borderBottomLeftRadius: '0', // Sin border radius en la esquina inferior izquierda
-        border: 'none', // Quitar el borde
-        background: "#000",
-       color:"white",
-       fontWeight:'bold'
-        
-      }}
-    >
-      Enviar
-    </Button>
-            </div>
-          )}
-        </div>
+        )}
+
+        {isContenedor3Visible && (
+          <div className="caja-contenedor-3" style={{ width: elementWidth }}>
+            <>
+              {selectedUser ? (
+                <>
+                  <div className="usuario-seleccionado">
+                    {elementWidth && elementWidth <= 641 && (
+                      <IconButton
+                        color="inherit"
+                        onClick={handleBackToUserList}
+                        sx={{
+                          marginLeft:
+                            elementWidth && elementWidth > 641 ? "20px" : "8px",
+                        }}
+                      >
+                        <ArrowBackIosIcon />
+                      </IconButton>
+                    )}
+                    <Typography
+                      variant="h6"
+                      component="div"
+                      sx={{
+                        marginLeft:
+                          elementWidth && elementWidth > 641 ? "24px" : "0px",
+                      }}
+                    >
+                      {loggedInUsers.find((user) => user.email === selectedUser)
+                        ?.name || "Usuario desconocido"}
+                    </Typography>
+                    <IconButton
+                      color="inherit"
+                      sx={{
+                        marginRight:
+                          elementWidth && elementWidth > 641 ? "20px" : "8px",
+                      }}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                  </div>
+                  <div className="caja-chat">
+                    <ChatBox selectedUser={selectedUser}>
+                      {messages
+                        .filter(
+                          (msg) => msg.conversationId === activeConversation
+                        )
+                        .map((message, index) => {
+                          const linkMatch =
+                            message.text.match(/https?:\/\/[^\s]+/g);
+                          const linkText = linkMatch ? linkMatch[0] : "";
+                          const textAfterLink = message.text
+                            .replace(linkText, "")
+                            .trim();
+
+                          return (
+                            <div
+                              className={
+                                message.isSender
+                                  ? "message-sender-container"
+                                  : "message-received-container"
+                              }
+                              key={index}
+                            >
+                              <Typography
+                                variant="body1"
+                                component="div"
+                                className={
+                                  message.isSender
+                                    ? "message-sender"
+                                    : "message-received"
+                                }
+                                ref={
+                                  index === messages.length - 1
+                                    ? lastMessageRef
+                                    : null
+                                }
+                                sx={{
+                                  marginBottom: "6px",
+                                  width: "fit-content",
+                                  maxWidth: "70%",
+                                  fontSize: "16.2px",
+                                }}
+                              >
+                                {linkText && (
+                                  <div
+                                    style={{
+                                      backgroundColor: "#151512",
+                                      padding: "5px",
+                                      borderRadius: "5px",
+                                    }}
+                                  >
+                                    <Link
+                                      href={linkText}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      underline="none"
+                                    >
+                                      {linkText}
+                                    </Link>
+                                  </div>
+                                )}
+                                {textAfterLink && <span>{textAfterLink}</span>}
+
+                                <strong className="timestamp">
+                                  {formatTimestamp(message.createdAt)}
+                                </strong>
+                              </Typography>
+                            </div>
+                          );
+                        })}
+                    </ChatBox>
+                  </div>
+                  <div className="caja-input-buton">
+                   
+                    <StyledInput
+                      id="filled-textarea"
+                      label="Escribir mensaje"
+                      multiline
+                      maxRows={4}
+                      variant="filled"
+                      placeholder="Escribir mensaje ..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      fullWidth
+                      sx={{borderRadius:'0px', backgroundColor:'#6FAFBC',padding:'10px'}}
+                      autoComplete="off"
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault(); // Previene la acción predeterminada de Enter
+                          sendMessage(); // Llama a la función sendMessage
+                        }
+                      }}
+                    />
+                    <StyledIconButton onClick={sendMessage}>
+                      <SendIcon />
+                    </StyledIconButton>
+                  </div>
+                </>
+              ) : (
+                <div className="message-container">
+                  <StyledMessageIcon></StyledMessageIcon>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontFamily: '"IBM Plex Mono", sans-serif' }}
+                  >
+                    Elige un usuario y comienza a chatear
+                  </Typography>
+                </div>
+              )}
+            </>
+          </div>
+        )}
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>Confirmar Cierre de Sesión</DialogTitle>
           <DialogContent>

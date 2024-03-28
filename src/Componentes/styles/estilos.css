@@ -39,7 +39,7 @@
   }
 
   a {
-    color: blue !important; /* Cambia el color del enlace a azul */
+    color: #1976d2 !important; /* Cambia el color del enlace a azul */
     text-decoration: none; /* Elimina el subrayado del enlace */
   }
   
