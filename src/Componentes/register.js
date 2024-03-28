@@ -162,7 +162,7 @@ const Register = () => {
     setUsernameError("");
     setPasswordError("");
 
-    fetch("https://chat-web-online.netlify.app/.netlify/functions/registerUser", {
+    fetch("/.netlify/functions/registerUser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
