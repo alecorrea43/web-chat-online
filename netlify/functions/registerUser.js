@@ -1,8 +1,12 @@
 const nodemailer = require('nodemailer');
 const User = require('./src/Componentes/User.js'); // Asegúrate de que la ruta sea correcta
 const bcrypt = require('bcrypt');
+const connectDB = require("/mongodb");
 
 exports.handler = async function(event, context) {
+
+  await connectDB();
+
  if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
  }
