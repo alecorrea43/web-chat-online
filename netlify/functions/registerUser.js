@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const User = require('/src/Componentes/User.js'); // Asegúrate de que la ruta sea correcta
+const User = require('./src/Componentes/User.js'); // Asegúrate de que la ruta sea correcta
 const bcrypt = require('bcrypt');
 
 exports.handler = async function(event, context) {
@@ -45,14 +45,23 @@ exports.handler = async function(event, context) {
 
     await transporter.sendMail(msg);
 
+    // Agrega los encabezados de CORS a la respuesta
     return {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Permite solicitudes desde cualquier origen
+        "Access-Control-Allow-Headers": "Content-Type", // Permite el encabezado Content-Type
+      },
       body: JSON.stringify({ message: "Usuario registrado exitosamente" }),
     };
  } catch (error) {
     console.error("Error al registrar el usuario:", error);
     return {
       statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Permite solicitudes desde cualquier origen
+        "Access-Control-Allow-Headers": "Content-Type", // Permite el encabezado Content-Type
+      },
       body: JSON.stringify({ error: "Error al registrar el usuario" }),
     };
  }
