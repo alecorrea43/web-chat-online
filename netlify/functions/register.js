@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
-const User = require("/Componentes/User");
+const User = require("../src/components/User");
 
 exports.handler = async (event) => {
   try {
