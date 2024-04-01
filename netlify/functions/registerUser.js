@@ -1,9 +1,13 @@
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const User = require("../../src/Componentes/User");
+const connectDB = require("../../mongodb");
 
 exports.handler = async (event) => {
   try {
+
+    await connectDB();
+
     const { name, email, password } = JSON.parse(event.body);
 
     if (!name || !email || !password) {
