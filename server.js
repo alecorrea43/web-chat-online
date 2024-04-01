@@ -23,7 +23,7 @@ const Message = require('./src/Componentes/Message');
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-     origin: 'https://web-chatonline.netlify.app', 
+     origin: 'http://localhost:3001', 
      methods: ['GET', 'POST'],
      allowedHeaders: ['my-custom-header'],
      credentials: true
@@ -148,7 +148,7 @@ io.on("connection", (socket) => {
 
 // Configuración de CORS
 const corsOptions = {
-  origin: "https://web-chatonline.netlify.app", // Cambia esto con la URL de tu aplicación React
+  origin: "*", // Cambia esto con la URL de tu aplicación React
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
