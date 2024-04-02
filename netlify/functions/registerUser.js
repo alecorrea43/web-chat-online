@@ -52,6 +52,7 @@ exports.handler = async function(event, context) {
               ? 'El nombre de usuario ya está en uso, elige otro.'
               : 'El correo ya ha sido registrado, crea otro o inicia sesión.',
         }),
+        headers,
       };
     }
 
