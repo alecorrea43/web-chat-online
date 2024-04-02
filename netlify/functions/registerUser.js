@@ -6,17 +6,13 @@ require('dotenv').config();
 
 exports.handler = async (event, context) => {
  // Configura CORS para permitir solicitudes desde tu dominio de origen
- const headers = {
-    "Access-Control-Allow-Origin": "https://web-chatonline.netlify.app", // Cambia esto a la URL de tu aplicación React en producción
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "OPTIONS,POST"
- };
+
 
  // Maneja la solicitud OPTIONS para CORS
  if (event.httpMethod === "POST") {
     return {
       statusCode: 200,
-      headers,
+    
       body: "CORS headers set"
     };
  }
@@ -28,7 +24,6 @@ exports.handler = async (event, context) => {
  if (!name || !email || !password) {
     return {
       statusCode: 400,
-      headers,
       body: JSON.stringify({ error: "Todos los campos son obligatorios." }),
     };
  }
