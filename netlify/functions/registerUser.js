@@ -7,7 +7,7 @@ require('dotenv').config();
 exports.handler = async (event, context) => {
  // Configura CORS para permitir solicitudes desde tu dominio de origen
  const headers = {
-  "Access-Control-Allow-Origin": "*", // Ajusta esto según sea necesario
+  "Access-Control-Allow-Origin": "https://web-chatonline.netlify.app", // Ajusta esto según sea necesario
   "Access-Control-Allow-Credentials": true,
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Allow-Methods": "OPTIONS,POST"
