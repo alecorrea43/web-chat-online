@@ -16,7 +16,7 @@ exports.handler = async function(event, context) {
 
  try {
     await client.connect();
-    const collection = client.db("yourDatabaseName").collection("users");
+    const collection = client.db("test").collection("users");
 
     // Verifica si el usuario ya existe
     const existingUser = await collection.findOne({ email });
