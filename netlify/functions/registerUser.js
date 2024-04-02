@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const User = require('../../Pages/User'); // Asegúrate de ajustar la ruta según tu estructura de archivos
+const User = require('../../src/Pages/User'); // Asegúrate de ajustar la ruta según tu estructura de archivos
 
 exports.handler = async (event, context) => {
  if (event.httpMethod !== "POST") {
