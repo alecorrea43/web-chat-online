@@ -14,7 +14,23 @@ const transporter = nodemailer.createTransport({
   },
  });
  
- exports.handler = async (event) => {
+ exports.handler = async (event, context) => {
+  // Configura CORS para permitir solicitudes desde tu dominio de origen
+  const headers = {
+     "Access-Control-Allow-Origin": "https://web-chatonline.netlify.app/register", // Cambia esto a la URL de tu aplicación React en producción
+     "Access-Control-Allow-Headers": "Content-Type",
+     "Access-Control-Allow-Methods": "OPTIONS,POST"
+  };
+ 
+  // Maneja la solicitud OPTIONS para CORS
+  if (event.httpMethod === "OPTIONS") {
+     return {
+       statusCode: 200,
+       headers,
+       body: "CORS headers set"
+     };
+  }
+ 
   // Parsea el cuerpo de la solicitud
   const body = JSON.parse(event.body);
   const { name, email, password } = body;
@@ -22,6 +38,7 @@ const transporter = nodemailer.createTransport({
   if (!name || !email || !password) {
      return {
        statusCode: 400,
+       headers,
        body: JSON.stringify({ error: "Todos los campos son obligatorios." }),
      };
   }
