@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './Componentes/login';
-import Register from './Componentes/register';
-import Chat from './Componentes/chat';
-import ForgotPassword from './Componentes/forgot-password';
-import ResetPassword from './Componentes/reset-password';
-import { AuthProvider } from './Componentes/AuthContext';
+import Login from './Pages/login';
+import Register from './Pages/register';
+import Chat from './Pages/chat';
+import ForgotPassword from './Pages/forgot-password';
+import ResetPassword from './Pages/reset-password';
+import { AuthProvider } from './Pages/AuthContext';
 
 
 

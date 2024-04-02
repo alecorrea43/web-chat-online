@@ -9,15 +9,15 @@ require("dotenv").config();
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const connectDB = require("./mongodb");
-const User = require("./src/Componentes/User.js");
-const RecoveryToken = require("./src/Componentes/RecoveryToken.js");
+const User = require("./src/Pages/User.js");
+const RecoveryToken = require("./src/Pages/RecoveryToken.js");
 let loggedInUsers = [];
 const app = express();
 const PORT = process.env.PORT || 3001;
 const http = require("http");
 const socketIo = require("socket.io");
 let emailToSocketIdMap = {};
-const Message = require('./src/Componentes/Message');
+const Message = require('./src/Pages/Message');
 
 
 const server = http.createServer(app);

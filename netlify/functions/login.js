@@ -1,5 +1,5 @@
 const connectDB = require('../../mongodb');
-const User = require('../../src/Componentes/User');
+const User = require('../../src/Pages/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
