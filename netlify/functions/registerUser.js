@@ -1,28 +1,47 @@
-const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
+const User = require('../../Pages/User'); // Asegúrate de ajustar la ruta según tu estructura de archivos
 
-exports.handler = async function(event, context) {
- // Configuración de MongoDB
- const uri = process.env.MONGODB_URI; // Asegúrate de tener esta variable de entorno configurada en Netlify
- const client = new MongoClient(uri);
+exports.handler = async (event, context) => {
+ if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
+ }
 
  try {
-    await client.connect();
-    const collection = client.db("test").collection("users");
+    // Conectar a la base de datos
+    await connectDB();
 
-    // Aquí puedes realizar operaciones en MongoDB, como insertar datos
-    const result = await collection.insertOne({ name: "John Doe", email: "john@example.com" });
+    // Parsear el cuerpo de la solicitud
+    const { name, email, password } = JSON.parse(event.body);
 
+    // Crear un nuevo usuario
+    const user = new User({ name, email, password });
+    await user.save();
+
+    // Responder con éxito
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Operación exitosa", result }),
+      body: JSON.stringify({ message: "Usuario registrado con éxito" }),
     };
  } catch (error) {
     console.error(error);
+    // Responder con error
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Error al conectar con MongoDB" }),
+      body: JSON.stringify({ error: "Error al registrar el usuario" }),
     };
- } finally {
-    await client.close();
  }
 };
+
+async function connectDB() {
+ try {
+    const mongoDBURL = process.env.MONGODB_URL;
+    await mongoose.connect(mongoDBURL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Conexión a MongoDB establecida correctamente');
+ } catch (error) {
+    console.error('Error al conectar con MongoDB:', error);
+    process.exit(1);
+ }
+}
