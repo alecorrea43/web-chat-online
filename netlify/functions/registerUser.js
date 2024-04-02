@@ -14,6 +14,15 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.handler = async function(event, context) {
+  const headers = {
+    "Access-Control-Allow-Origin": "*", // Permite solicitudes de cualquier origen
+    "Access-Control-Allow-Headers": "Content-Type", // Permite el encabezado Content-Type
+    // Puedes agregar más encabezados según sea necesario
+ };
+
+
+
+
  if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
  }
@@ -24,6 +33,7 @@ exports.handler = async function(event, context) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: 'Todos los campos son obligatorios.' }),
+      headers,
     };
  }
 
@@ -62,12 +72,14 @@ exports.handler = async function(event, context) {
     return {
       statusCode: 200,
       body: JSON.stringify({ message: 'Usuario registrado exitosamente y correo enviado' }),
+      headers,
     };
  } catch (err) {
     return {
       statusCode: 500,
       body: JSON.stringify({
         error: 'Ha ocurrido algún error. Por favor, vuelve a intentarlo.',
+        headers,
       }),
     };
  }
