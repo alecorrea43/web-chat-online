@@ -4,6 +4,8 @@ const nodemailer = require("nodemailer");
 const User = require("../../src/Componentes/User");
 const connectDB = require("../../mongodb");
 
+
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
