@@ -162,7 +162,7 @@ const Register = () => {
     setUsernameError("");
     setPasswordError("");
 
-    fetch(".netlify/functions/registerUser", {
+    fetch("http://localhost:3001/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
