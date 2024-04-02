@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
 const User = require("../../src/Componentes/User"); // Asegúrate de que esta ruta sea correcta
 const connectDB = require("../../mongodb"); // Asegúrate de que esta ruta sea correcta
+require('dotenv').config();
 
 exports.handler = async (event, context) => {
  // Configura CORS para permitir solicitudes desde tu dominio de origen
