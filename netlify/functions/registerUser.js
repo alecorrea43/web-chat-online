@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 
 exports.handler = async function(event, context) {
 
-
+  console.log("Evento recibido:", event);
 
   
  if (event.httpMethod !== 'POST') {
