@@ -1,5 +1,5 @@
 const connectDB = require('../../mongodb');
-const User = require('../../src/Componentes/User');
+const User = require('../../src/Componentes/User'); // Asegúrate de que la ruta sea correcta
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
