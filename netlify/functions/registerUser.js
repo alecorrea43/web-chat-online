@@ -6,7 +6,7 @@ const connectDB = require("../../mongodb"); // Asegúrate de que esta ruta sea c
 exports.handler = async (event, context) => {
  // Configura CORS para permitir solicitudes desde tu dominio de origen
  const headers = {
-    "Access-Control-Allow-Origin": "*", // Cambia esto a la URL de tu aplicación React en producción
+    "Access-Control-Allow-Origin": "https://web-chatonline.netlify.app", // Cambia esto a la URL de tu aplicación React en producción
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "OPTIONS,POST"
  };
