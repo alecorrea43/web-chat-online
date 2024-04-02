@@ -216,9 +216,7 @@ const Login = () => {
     window.location.href = "#miSeccion";
   };
 
-  const handleClick = () => {
-    navigate('/register');
- };
+  
 
   return (
     <StyledContainer component="main" maxWidth="xl">
@@ -314,9 +312,7 @@ const Login = () => {
             </MuiAlert>
           </Snackbar>
           <StyledTypography variant="body2">
-            ¿No tienes una cuenta?  <div onClick={handleClick} >
-        Registrarse
-      </div>
+            ¿No tienes una cuenta? <Link to="/register">Registrarse</Link>
           </StyledTypography>
         </StyledFormContainerBox>
       </StyledFormContainer>
