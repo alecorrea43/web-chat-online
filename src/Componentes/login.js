@@ -310,7 +310,7 @@ const Login = () => {
             </MuiAlert>
           </Snackbar>
           <StyledTypography variant="body2">
-            ¿No tienes una cuenta? <Link to="/register">Registrarse</Link>
+            ¿No tienes una cuenta? <Link to="/register" target="_blank">Registrarse</Link>
           </StyledTypography>
         </StyledFormContainerBox>
       </StyledFormContainer>
