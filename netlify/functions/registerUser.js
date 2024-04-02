@@ -13,7 +13,7 @@ exports.handler = async (event, context) => {
  };
 
  // Maneja la solicitud OPTIONS para CORS
- if (event.httpMethod === "OPTIONS") {
+ if (event.httpMethod === "POST") {
     return {
       statusCode: 200,
       headers,
