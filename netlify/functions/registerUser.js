@@ -1,15 +1,15 @@
 require('dotenv').config(); // Importa las variables de entorno desde .env
 const mongoose = require('mongoose');
 const User = require('../../src/Pages/User'); // Importa el modelo de usuario
+const connectDB = require('../../mongodb'); // Importa la función de conexión a MongoDB
 
 exports.handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false; // Permite cerrar la conexión después de la operación
 
   try {
-    console.log('Conectando a la base de datos...');
-    await mongoose.connect(process.env.MONGODB_URL);
+    console.log('Intentando conectar a la base de datos...');
+    await connectDB(); // Conecta a la base de datos MongoDB
     console.log('Conexión exitosa.');
-
     const { name, email, password } = JSON.parse(event.body);
 
     // Verifica si el usuario ya está registrado
@@ -30,7 +30,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ message: 'Registro exitoso.' }),
     };
   } catch (error) {
-    console.error('Error al conectar a la base de datos:', error);
+    console.error('Error al procesar la solicitud:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Hubo un error al procesar la solicitud.' }),
@@ -38,6 +38,5 @@ exports.handler = async (event, context) => {
   } finally {
     // Cierra la conexión de MongoDB al finalizar la operación
     await mongoose.connection.close();
-    console.log('Conexión cerrada.');
   }
 };
