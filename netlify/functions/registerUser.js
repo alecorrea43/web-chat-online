@@ -1,47 +1,42 @@
+require('dotenv').config(); // Importa las variables de entorno desde .env
 const mongoose = require('mongoose');
-const User = require('../../src/Pages/User'); // Asegúrate de ajustar la ruta según tu estructura de archivos
+const User = require('../../src/Pages/User'); // Importa el modelo de usuario
 
 exports.handler = async (event, context) => {
- if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
- }
+  context.callbackWaitsForEmptyEventLoop = false; // Permite cerrar la conexión después de la operación
 
- try {
-    // Conectar a la base de datos
-    await connectDB();
-
-    // Parsear el cuerpo de la solicitud
-    const { name, email, password } = JSON.parse(event.body);
-
-    // Crear un nuevo usuario
-    const user = new User({ name, email, password });
-    await user.save();
-
-    // Responder con éxito
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: "Usuario registrado con éxito" }),
-    };
- } catch (error) {
-    console.error(error);
-    // Responder con error
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Error al registrar el usuario" }),
-    };
- }
-};
-
-async function connectDB() {
- try {
-    const mongoDBURL = process.env.MONGODB_URL;
-    await mongoose.connect(mongoDBURL, {
+  try {
+    await mongoose.connect(process.env.MONGODB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('Conexión a MongoDB establecida correctamente');
- } catch (error) {
-    console.error('Error al conectar con MongoDB:', error);
-    process.exit(1);
- }
-}
+
+    const { name, email, password } = JSON.parse(event.body);
+
+    // Verifica si el usuario ya está registrado
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'El correo electrónico ya está registrado.' }),
+      };
+    }
+
+    // Crea un nuevo usuario
+    const newUser = new User({ name, email, password });
+    await newUser.save();
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: 'Registro exitoso.' }),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Hubo un error al procesar la solicitud.' }),
+    };
+  } finally {
+    // Cierra la conexión de MongoDB al finalizar la operación
+    await mongoose.connection.close();
+  }
+};
