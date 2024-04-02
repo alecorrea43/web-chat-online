@@ -76,7 +76,7 @@ const ForgotPassword = () => {
 
   const checkExistingRequest = async (email) => {
     try {
-      const response = await fetch("https://web-chatonline.netlify.app/check-existing-request", {
+      const response = await fetch("http://localhost:3001/check-existing-request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -122,7 +122,7 @@ const ForgotPassword = () => {
     }
 
     try {
-      const response = await fetch("https://web-chatonline.netlify.app/forgot-password", {
+      const response = await fetch("http://localhost:3001/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
