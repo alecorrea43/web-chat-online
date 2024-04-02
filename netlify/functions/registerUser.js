@@ -6,10 +6,7 @@ exports.handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false; // Permite cerrar la conexión después de la operación
 
   try {
-    await mongoose.connect(process.env.MONGODB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGODB_URL);
 
     const { name, email, password } = JSON.parse(event.body);
 
