@@ -11,7 +11,7 @@ exports.handler = async function(event, context) {
  const { name, email, password } = data;
 
  // Configuración de MongoDB
- const uri = process.env.MONGODB_URI; // Asegúrate de tener esta variable de entorno configurada en Netlify
+ const uri = process.env.MONGODB_URL; // Asegúrate de tener esta variable de entorno configurada en Netlify
  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
  try {
