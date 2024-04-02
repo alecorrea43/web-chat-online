@@ -115,7 +115,6 @@ const Register = () => {
     // Verificar la conexión a Internet
     if (!navigator.onLine) {
       // No hay conexión, mostrar mensaje de error en rojo
-      
       setSnackbarMessage(
         "No hay conexión a Internet. Por favor, verifica tu conexión."
       );
@@ -163,7 +162,7 @@ const Register = () => {
     setUsernameError("");
     setPasswordError("");
 
-    fetch("https://web-chatonline.netlify.app/.netlify/functions/registerUser", {
+    fetch("https://localhost:3001/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -175,7 +174,6 @@ const Register = () => {
       }),
     })
       .then((response) => {
-        console.log("Respuesta de la función:", response);
         if (!response.ok) {
           throw new Error("error");
         }
@@ -194,7 +192,6 @@ const Register = () => {
         setSnackbarOpen(true); // Mostrar la alerta instantáneamente
       })
       .catch((error) => {
-        console.log("Error en la solicitud:", error);
         // Otro manejo de errores en rojo
         setSnackbarMessage(error.message);
         setSnackbarSeverity("error");
