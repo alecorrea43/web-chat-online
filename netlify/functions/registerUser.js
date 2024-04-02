@@ -1,78 +1,47 @@
-const connectDB = require('../../mongodb');
-const User = require('../../src/Pages/User'); // Asegúrate de que la ruta sea correcta
-const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
-require('dotenv').config();
-
-// Configuración de Nodemailer
-const transporter = nodemailer.createTransport({
- service: 'gmail',
- auth: {
-    user: process.env.GMAIL_USERNAME,
-    pass: process.env.GMAIL_PASSWORD,
- },
-});
+const { MongoClient } = require('mongodb');
 
 exports.handler = async function(event, context) {
-
-  console.log("Evento recibido:", event);
-
-  
- if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+ if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
  }
 
  const { name, email, password } = JSON.parse(event.body);
 
- if (!name || !email || !password) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Todos los campos son obligatorios.' }),
-    };
- }
+ // Conectar a MongoDB
+ const uri = process.env.MONGODB_URI;
+ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
  try {
-    // Asegurarse de que la base de datos esté conectada
-    await connectDB();
+    await client.connect();
+    const collection = client.db("yourDatabaseName").collection("users");
 
-    const existingUser = await User.findOne({ $or: [{ name }, { email }] });
-
+    // Verificar si el usuario ya existe
+    const existingUser = await collection.findOne({ email });
     if (existingUser) {
       return {
-        statusCode: 200,
-        body: JSON.stringify({
-          error:
-            existingUser.name === name
-              ? 'El nombre de usuario ya está en uso, elige otro.'
-              : 'El correo ya ha sido registrado, crea otro o inicia sesión.',
-        }),
+        statusCode: 400,
+        body: JSON.stringify({ error: "El correo electrónico ya está en uso" }),
       };
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword });
-    await newUser.save();
+    // Aquí asumimos que estás almacenando las contraseñas en texto plano, lo cual no es seguro.
+    // Deberías considerar el uso de hash y salting para las contraseñas.
+    const newUser = { name, email, password };
 
-    // Enviar correo de confirmación
-    const mailOptions = {
-      from: process.env.GMAIL_USERNAME,
-      to: email,
-      subject: 'Registro exitoso',
-      text: `Hola ${name}, gracias por registrarte en nuestra aplicación.`,
-    };
-
-    await transporter.sendMail(mailOptions);
+    // Insertar el nuevo usuario en la base de datos
+    await collection.insertOne(newUser);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Usuario registrado exitosamente y correo enviado' }),
+      body: JSON.stringify({ message: "Usuario registrado exitosamente" }),
     };
- } catch (err) {
+ } catch (error) {
+    console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: 'Ha ocurrido algún error. Por favor, vuelve a intentarlo.',
-      }),
+      body: JSON.stringify({ error: "Error interno del servidor" }),
     };
+ } finally {
+    await client.close();
  }
 };
