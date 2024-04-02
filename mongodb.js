@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const mongoDBURL = process.env.MONGODB_URL || 'mongodb://localhost:27017/base-de-datos';
+    const mongoDBURL = process.env.MONGODB_URL;
 
     await mongoose.connect(mongoDBURL, {
   
