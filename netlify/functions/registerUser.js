@@ -7,7 +7,7 @@ exports.handler = async function(event, context) {
 
  try {
     await client.connect();
-    const collection = client.db("yourDatabaseName").collection("yourCollectionName");
+    const collection = client.db("test").collection("users");
 
     // Aquí puedes realizar operaciones en MongoDB, como insertar datos
     const result = await collection.insertOne({ name: "John Doe", email: "john@example.com" });
