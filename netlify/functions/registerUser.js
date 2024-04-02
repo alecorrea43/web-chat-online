@@ -1,7 +1,6 @@
 const connectDB = require('../../mongodb');
 const User = require('../../src/Componentes/User');
 const bcrypt = require('bcrypt');
-
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
