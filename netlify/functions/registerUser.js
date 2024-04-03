@@ -11,7 +11,7 @@ exports.handler = async (event, context) => {
   const uri = process.env.MONGODB_URI;
 
   // Conectar a MongoDB
-  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const db = client.db('test');
