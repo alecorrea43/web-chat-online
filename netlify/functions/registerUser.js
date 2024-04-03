@@ -1,6 +1,5 @@
 const {MongoClient}= require('mongodb')
 require('dotenv').config(); // Importa las variables de entorno desde .env
-const mongoClient = new MongoClient(process.env.MONGODB_URI);
 const User = require('../../src/Pages/User'); // Importa el modelo de usuario
 
 
@@ -8,11 +7,14 @@ const uri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_DATABASE;
 const collectionName = process.env.MONGODB_COLLECTION;
 
-const client = mongoClient.connect(uri);
+let client;
 
 exports.handler = async (event, context) => {
   try {
-    await client.connect();
+    if (!client) {
+      client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+      await client.connect();
+    }
 
     const { name, email, password } = JSON.parse(event.body);
 
@@ -47,7 +49,5 @@ exports.handler = async (event, context) => {
       statusCode: 500,
       body: JSON.stringify({ error: 'Hubo un error al procesar la solicitud.' }),
     };
-  } finally {
-    await client.close();
   }
 };
