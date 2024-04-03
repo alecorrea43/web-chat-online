@@ -11,7 +11,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/registerUser', usuario);
+      const response = await axios.post('/.netlify/functions/registerUser', usuario);
       console.log(response.data);
       // Aquí puedes redirigir al usuario a la página de inicio de sesión o mostrar un mensaje de éxito
     } catch (error) {
