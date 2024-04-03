@@ -14,8 +14,8 @@ exports.handler = async (event, context) => {
  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
  try {
     await client.connect();
-    const db = client.db('test');
-    const collection = db.collection('users');
+    const db = client.db('nombre_de_tu_base_de_datos'); // Asegúrate de reemplazar 'nombre_de_tu_base_de_datos' con el nombre real de tu base de datos
+    const collection = db.collection('usuarios');
 
     // Aquí puedes insertar el usuario en la base de datos
     const result = await collection.insertOne({ nombre, email, password });
