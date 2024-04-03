@@ -2,11 +2,18 @@ const {MongoClient}= require('mongodb')
 require('dotenv').config(); // Importa las variables de entorno desde .env
 const mongoClient = new MongoClient(process.env.MONGODB_URI);
 const User = require('../../src/Pages/User'); // Importa el modelo de usuario
-const client = mongoClient.connect();
+
+
+const uri = process.env.MONGODB_URI;
+const dbName = process.env.MONGODB_DATABASE;
+const collectionName = process.env.MONGODB_COLLECTION;
+
+const client = mongoClient.connect(uri);
 
 exports.handler = async (event, context) => {
   try {
     await client.connect();
+
     const { name, email, password } = JSON.parse(event.body);
 
     // Validar datos de entrada
@@ -18,7 +25,7 @@ exports.handler = async (event, context) => {
     }
 
     // Verificar si el usuario ya está registrado
-    const existingUser = await User.findOne({ email });
+    const existingUser = await client.db(dbName).collection(collectionName).findOne({ email });
     if (existingUser) {
       return {
         statusCode: 400,
@@ -28,7 +35,7 @@ exports.handler = async (event, context) => {
 
     // Crear un nuevo usuario
     const newUser = new User({ name, email, password });
-    await newUser.save();
+    await client.db(dbName).collection(collectionName).insertOne(newUser);
 
     return {
       statusCode: 200,
