@@ -1,36 +1,58 @@
 const { MongoClient } = require('mongodb');
+require('dotenv').config(); // Importa las variables de entorno desde .env
+const User = require('../../src/Pages/User'); // Importa el modelo de usuario
+
+const uri = process.env.MONGODB_URI;
+const dbName = process.env.MONGODB_DATABASE;
+const collectionName = process.env.MONGODB_COLLECTION;
+
+let client;
 
 exports.handler = async (event, context) => {
- if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
- }
+  try {
+    if (!client) {
+      client = new MongoClient(uri);
+      await client.connect();
+      console.log('Conexión a MongoDB establecida.');
+    }
 
- const { nombre, email, password } = JSON.parse(event.body);
+    const { name, email, password } = JSON.parse(event.body);
+    console.log('Datos recibidos:', { name, email, password });
 
- // Acceder a la variable de entorno MONGODB_URI
- const uri = process.env.MONGODB_URI;
+    // Validar datos de entrada
+    if (!name || !email || !password) {
+      console.log('Campos obligatorios faltantes.');
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Faltan campos obligatorios.' }),
+      };
+    }
 
- // Conectar a MongoDB
- const client = new MongoClient(uri);
- try {
-    await client.connect();
-    const db = client.db('test'); // Asegúrate de reemplazar 'nombre_de_tu_base_de_datos' con el nombre real de tu base de datos
-    const collection = db.collection('users');
+    // Verificar si el usuario ya está registrado
+    const existingUser = await client.db(dbName).collection(collectionName).findOne({ email });
+    if (existingUser) {
+      console.log('El correo electrónico ya está registrado.');
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'El correo electrónico ya está registrado.' }),
+      };
+    }
 
-    // Aquí puedes insertar el usuario en la base de datos
-    const result = await collection.insertOne({ nombre, email, password });
+    // Crear un nuevo usuario
+    const newUser = new User({ name, email, password });
+    console.log('Nuevo usuario:', newUser);
+    await client.db(dbName).collection(collectionName).insertOne(newUser);
 
+    console.log('Usuario registrado exitosamente.');
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Usuario registrado exitosamente", userId: result.insertedId }),
+      body: JSON.stringify({ message: 'Registro exitoso.' }),
     };
- } catch (error) {
-    console.error(error);
+  } catch (error) {
+    console.error('Error al procesar la solicitud:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Error al registrar el usuario" }),
+      body: JSON.stringify({ error: 'Hubo un error al procesar la solicitud.' }),
     };
- } finally {
-    await client.close();
- }
+  }
 };
