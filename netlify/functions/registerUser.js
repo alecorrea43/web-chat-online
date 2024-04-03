@@ -1,4 +1,5 @@
 const { MongoClient } = require('mongodb');
+require('dotenv').config()
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
