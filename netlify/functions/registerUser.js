@@ -1,6 +1,6 @@
 const {MongoClient}= require('mongodb')
 require('dotenv').config(); // Importa las variables de entorno desde .env
-const mongoClient = new MongoClient(process.env.MONGO_URI);
+const mongoClient = new MongoClient(process.env.MONGODB_URI);
 const User = require('../../src/Pages/User'); // Importa el modelo de usuario
 const client = mongoClient.connect();
 
