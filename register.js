@@ -106,7 +106,8 @@ const Register = () => {
   const [emailError, setEmailError] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-
+  const fetch = require('node-fetch');
+  
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
