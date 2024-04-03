@@ -1,18 +1,23 @@
+const {MongoClient}= require('mongodb')
 require('dotenv').config(); // Importa las variables de entorno desde .env
-const mongoose = require('mongoose');
+const mongoClient = new MongoClient(process.env.MONGO_URI);
 const User = require('../../src/Pages/User'); // Importa el modelo de usuario
-const connectDB = require('../../mongodb'); // Importa la función de conexión a MongoDB
+const client = mongoClient.connect();
 
 exports.handler = async (event, context) => {
-  context.callbackWaitsForEmptyEventLoop = false; // Permite cerrar la conexión después de la operación
-
   try {
-    console.log('Intentando conectar a la base de datos...');
-    await connectDB(); // Conecta a la base de datos MongoDB
-    console.log('Conexión exitosa.');
+    await client.connect();
     const { name, email, password } = JSON.parse(event.body);
 
-    // Verifica si el usuario ya está registrado
+    // Validar datos de entrada
+    if (!name || !email || !password) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Faltan campos obligatorios.' }),
+      };
+    }
+
+    // Verificar si el usuario ya está registrado
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return {
@@ -21,7 +26,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Crea un nuevo usuario
+    // Crear un nuevo usuario
     const newUser = new User({ name, email, password });
     await newUser.save();
 
@@ -36,7 +41,6 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ error: 'Hubo un error al procesar la solicitud.' }),
     };
   } finally {
-    // Cierra la conexión de MongoDB al finalizar la operación
-    await mongoose.connection.close();
+    await client.close();
   }
 };
