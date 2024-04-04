@@ -1,24 +1,27 @@
+const express = require('express');
+const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
 
-exports.handler = async (event, context) => {
- if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
- }
+const app = express();
+app.use(bodyParser.json());
 
- const client = new MongoClient(process.env.MONGODB_URI);
+const client = new MongoClient(process.env.MONGODB_URI);
 
+app.post('/register', async (req, res) => {
  try {
     await client.connect();
     const collection = client.db("test").collection("users");
-    const user = JSON.parse(event.body);
+    const user = req.body;
     const result = await collection.insertOne(user);
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: "User registered successfully", userId: result.insertedId }),
-    };
+    res.status(200).json({ message: "User registered successfully", userId: result.insertedId });
  } catch (error) {
-    return { statusCode: 500, body: error.toString() };
+    console.error(error);
+    res.status(500).json({ message: "Error registering user" });
  } finally {
     await client.close();
  }
+});
+
+exports.handler = async (event, context) => {
+ return app(event, context);
 };

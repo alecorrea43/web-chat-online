@@ -15,7 +15,7 @@ const Register = () => {
  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/.netlify/functions/register', formData);
+        const response = await axios.post('/.netlify/functions/server/register', formData);
       alert(response.data.message);
     } catch (error) {
       alert('Error al registrarse');
