@@ -14,6 +14,7 @@ const client = new MongoClient(process.env.MONGODB_URI);
 
 app.post('/register', async (req, res) => {
  try {
+   console.log('Solicitud recibida:', req.body);
     await client.connect();
     const collection = client.db("test").collection("users");
     const user = req.body;
