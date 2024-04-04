@@ -13,5 +13,6 @@ const router = express.Router();
 router.post("/register", (req, res) => {
 res.json(Register.handleRegister(req));
 });
+
 app.use("/.netlify/functions/server", router);
 export const handler = serverless(app);
