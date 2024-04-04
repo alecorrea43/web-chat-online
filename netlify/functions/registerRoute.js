@@ -1,45 +1,24 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
-const User = require("../../src/Pages/User"); // Asegúrate de que esta ruta sea correcta
-const cors = require("cors");
-const router = express.Router();
-const connectDB = require("../../mongodb");
-const serverless = require("serverless-http");
+const { MongoClient } = require('mongodb');
 
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-connectDB();
-
-router.post("/register", async (req, res) => {
- const { name, email, password } = req.body;
-
- if (!name || !email || !password) {
-    return res.status(400).json({ error: "Todos los campos son obligatorios." });
+exports.handler = async (event, context) => {
+ if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
  }
+
+ const client = new MongoClient(process.env.MONGODB_URI);
 
  try {
-    const existingUser = await User.findOne({ $or: [{ name }, { email }] });
-
-    if (existingUser) {
-      return res.status(200).json({
-        error: existingUser.name === name
-          ? "El nombre de usuario ya está en uso, elige otro."
-          : "El correo ya ha sido registrado, crea otro o inicia sesión.",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword });
-    await newUser.save();
-
-    return res.json({ message: "Usuario registrado exitosamente" });
- } catch (err) {
-    return res.status(500).json({
-      error: "Ha ocurrido algún error. Por favor, vuelve a intentarlo.",
-    });
+    await client.connect();
+    const collection = client.db("test").collection("users");
+    const user = JSON.parse(event.body);
+    const result = await collection.insertOne(user);
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "User registered successfully", userId: result.insertedId }),
+    };
+ } catch (error) {
+    return { statusCode: 500, body: error.toString() };
+ } finally {
+    await client.close();
  }
-});
-
-module.exports.handler = serverless(app);
+};
