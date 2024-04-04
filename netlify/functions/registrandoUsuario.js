@@ -14,7 +14,7 @@ const client = new MongoClient(process.env.MONGODB_URI);
 
 // Aquí puedes agregar tus rutas y lógica de negocio
 // Por ejemplo, una ruta simple que devuelve un mensaje
-app.get('/hello', (req, res) => {
+app.post('/hello', (req, res) => {
    res.send('Hello World!');
   });
   
