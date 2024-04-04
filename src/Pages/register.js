@@ -47,7 +47,7 @@ const Contact = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://my-portafolio-ac.netlify.app/.netlify/functions/server', {
+      const response = await fetch('https://web-chat-online.netlify.app/.netlify/functions/server', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
