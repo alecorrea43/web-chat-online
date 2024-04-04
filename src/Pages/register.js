@@ -1,63 +1,49 @@
-// En tu componente Contact.jsx
 import React, { useState } from 'react';
 import { styled } from '@mui/system';
 import { Typography, TextField, Button } from '@mui/material';
-import CustomAlert from './CustomAlert';
-
-
 
 const ContactContainer = styled('div')({
-  height: '100vh',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#f5f5f5',
-  marginLeft:'16px',
-  marginRight:'16px',
-  marginTop:'200px',
-  color: 'white', 
+ height: '100vh',
+ display: 'flex',
+ flexDirection: 'column',
+ justifyContent: 'center',
+ alignItems: 'center',
+ backgroundColor: '#f5f5f5',
+ marginLeft:'16px',
+ marginRight:'16px',
+ marginTop:'200px',
+ color: 'white', 
 });
 
 const InnerContainer = styled('div')({
-  backgroundColor: '#1C1C1C',
-  padding: '20px',
-  width: '80%',
-  maxWidth: '700px',
-  boxShadow: '0 0 20px 0 rgba(0, 0, 0, 0.5)',
+ backgroundColor: '#1C1C1C',
+ padding: '20px',
+ width: '80%',
+ maxWidth: '700px',
+ boxShadow: '0 0 20px 0 rgba(0, 0, 0, 0.5)',
 });
 
 const StyledButton = styled(Button)({
-  backgroundColor: '#C84810',
-  color: 'white',
-  '&:hover': {
+ backgroundColor: '#C84810',
+ color: 'white',
+ '&:hover': {
     backgroundColor: '#C84810',
     color: 'white',
-  },
+ },
 });
 
 const NoBorderTextField = ({ ...props }) => (
-  <TextField className="NoBorderTextField-root" {...props} />
+ <TextField className="NoBorderTextField-root" {...props} />
 );
 
-
-
 const Contact = () => {
-  const [formData, setFormData] = useState({
+ const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: '',
-  });
+ });
 
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertSeverity, setAlertSeverity] = useState('success');
-  const [alertMessage, setAlertMessage] = useState('');
-
-  const handleAlertClose = () => {
-    setAlertOpen(false);
-  };
-
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
@@ -73,30 +59,22 @@ const Contact = () => {
       console.log(data.message);
 
       if (response.ok) {
-        setAlertSeverity('success');
-        setAlertMessage('Mensaje enviado con éxito');
+        alert('Mensaje enviado con éxito');
       } else {
-        setAlertSeverity('error');
-        setAlertMessage('Error al enviar el mensaje. Intenta de nuevo.');
+        alert('Error al enviar el mensaje. Intenta de nuevo.');
       }
-
-      setAlertOpen(true);
       
     } catch (error) {
       console.error('Error al enviar el formulario:', error);
-      setAlertSeverity('error');
-      setAlertMessage('Error al enviar el mensaje. Intenta de nuevo.');
-      setAlertOpen(true);
-     
+      alert('Error al enviar el mensaje. Intenta de nuevo.');
     }
-  };
+ };
 
-  const handleChange = (e) => {
+ const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+ };
 
-  return (
-    
+ return (
     <ContactContainer>
       <InnerContainer>
         <Typography
@@ -151,15 +129,9 @@ const Contact = () => {
             Enviar Mensaje
           </StyledButton>
         </form>
-        <CustomAlert
-          open={alertOpen}
-          onClose={handleAlertClose}
-          severity={alertSeverity}
-          message={alertMessage}
-        />
       </InnerContainer>
     </ContactContainer>
-  );
+ );
 };
 
 export default Contact;
