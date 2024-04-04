@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
+const awsServerlessExpress = require('aws-serverless-express');
 
 const app = express();
 app.use(bodyParser.json());
@@ -22,6 +23,11 @@ app.post('/register', async (req, res) => {
  }
 });
 
-exports.handler = async (event, context) => {
- return app(event, context);
+// Crear un servidor con aws-serverless-express
+const server = awsServerlessExpress.createServer(app);
+
+// Exportar la función handler para AWS Lambda
+exports.handler = (event, context) => {
+ // Proxy el evento y el contexto a aws-serverless-express
+ return awsServerlessExpress.proxy(server, event, context, 'PROMISE').promise;
 };
