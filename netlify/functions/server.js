@@ -7,9 +7,7 @@ const cors = require('cors');
 
 const app = express();
 
-app.use(cors({
-   origin: 'https://web-chat-online.netlify.app' 
-  }));
+app.use(cors());
 app.use(bodyParser.json());
 
 const client = new MongoClient(process.env.MONGODB_URI);
