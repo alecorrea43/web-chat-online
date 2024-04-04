@@ -6,3 +6,7 @@
 
 [build]
  functions = "functions"
+
+[[edge_functions]]
+function = "server.js"
+path = "/test"
