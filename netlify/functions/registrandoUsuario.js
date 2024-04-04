@@ -21,6 +21,7 @@ const Message = require('../../src/Pages/Message.js');
 const awsServerlessExpress = require('aws-serverless-express');
 
 const server = awsServerlessExpress.createServer(app);
+
 const io = socketIo(server, {
   cors: {
      origin: 'http://localhost:3000', 
@@ -748,10 +749,6 @@ async function sendConfirmationEmail(email) {
 }
 
 // Función para insertar un nuevo usuario en la base de datos
-
-server.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
 
 
 // Exportar la función handler para AWS Lambda
