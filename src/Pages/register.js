@@ -16,7 +16,7 @@ const Register = () => {
     e.preventDefault();
     try {
        
-        const response = await axios.post('https://web-chat-online.netlify.app/.netlify/functions/server/register', formData, {
+        const response = await axios.post('https://web-chat-online.netlify.app/.netlify/functions/server', formData, {
             headers: {
                 'Content-Type': 'application/json',
             },
