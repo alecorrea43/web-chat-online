@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const serverless = require("serverless-http");
-
+const connectDB = require("../../mongodb")
 const bcrypt = require("bcrypt"); // Asegúrate de requerir bcrypt si lo estás utilizando
 const User = require("../../src/Pages/User"); // Asegúrate de tener un modelo de usuario
 // Asegúrate de tener una función para enviar correos de confirmación
@@ -9,6 +9,8 @@ const User = require("../../src/Pages/User"); // Asegúrate de tener un modelo d
 const app = express();
 app.use(cors());
 app.use(express.json()); // Asegúrate de usar un middleware para parsear el cuerpo de las solicitudes JSON
+connectDB();
+
 
 const port = process.env.PORT || 5000;
 const router = express.Router();
