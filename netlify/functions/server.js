@@ -52,7 +52,7 @@ router.post("/register", async (req, res) => {
  }
 });
 
-app.use("/.netlify/functions/server", router);
+app.use(router);
 
 // Exporta la función handler usando CommonJS
 module.exports.handler = serverless(app);
