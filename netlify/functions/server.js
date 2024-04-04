@@ -8,7 +8,7 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors({
-   origin: 'https://web-chat-online.netlify.app/register' // Solo permite solicitudes desde http://example.com
+   origin: 'https://web-chat-online.netlify.app/register' 
   }));
 app.use(bodyParser.json());
 
