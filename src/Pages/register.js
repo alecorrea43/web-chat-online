@@ -164,7 +164,7 @@ const Register = () => {
     setPasswordError("");
     try {
       const response = await fetch("https://web-chat-online.netlify.app/.netlify/functions/server", {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
