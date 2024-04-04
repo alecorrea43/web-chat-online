@@ -5,4 +5,4 @@
  status = 200
 
 [build]
- functions = "netlify/functions"
+ functions = "functions"
