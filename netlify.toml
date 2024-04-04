@@ -7,3 +7,6 @@
 [build]
  functions = "netlify/functions"
 
+[[functions]]
+ name = "server"
+ timeout = 30 
