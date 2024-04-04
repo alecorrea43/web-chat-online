@@ -6,3 +6,8 @@
 
 [build]
  functions = "netlify/functions"
+
+
+[[functions]]
+ name = "server"
+ path = "path/to/your/server.js"
