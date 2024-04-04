@@ -1,47 +1,37 @@
-const nodemailer = require('nodemailer');
-require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const { MongoClient } = require('mongodb');
+const awsServerlessExpress = require('aws-serverless-express');
+const cors = require('cors');
 
-exports.handler = async function(event, context) {
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ message: 'Method Not Allowed' }),
-    };
-  }
 
-  const { name, email, message } = JSON.parse(event.body);
+const app = express();
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: true,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
+app.use(cors());
+app.use(bodyParser.json());
 
-  const mailOptions = {
-    from: process.env.SMTP_USER,
-    to: process.env.TO_EMAIL,
-    subject: 'Nuevo mensaje de contacto',
-    text: `Nombre: ${name}\nCorreo Electrónico: ${email}\nMensaje: ${message}`,
-  };
+const client = new MongoClient(process.env.MONGODB_URI);
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: 'Correo enviado con éxito', info: info.response }),
-    };
-  } catch (error) {
-    console.error('Error al enviar el correo:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: 'Error al enviar el correo', error: error.message }),
-    };
-  }
+app.post('/register', async (req, res) => {
+ try {
+    await client.connect();
+    const collection = client.db("test").collection("users");
+    const user = req.body;
+    const result = await collection.insertOne(user);
+    res.status(200).json({ message: "User registered successfully", userId: result.insertedId });
+ } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error registering user" });
+ } finally {
+    await client.close();
+ }
+});
+
+// Crear un servidor con aws-serverless-express
+const server = awsServerlessExpress.createServer(app);
+
+// Exportar la función handler para AWS Lambda
+exports.handler = (event, context) => {
+ // Proxy el evento y el contexto a aws-serverless-express
+ return awsServerlessExpress.proxy(server, event, context, 'PROMISE').promise;
 };
