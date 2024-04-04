@@ -43,7 +43,7 @@
   },
   "scripts": {
  
-    "build": "netlify deploy --prod",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start":"node functions/server.js"
