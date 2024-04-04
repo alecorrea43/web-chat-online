@@ -11,7 +11,6 @@ app.use(cors());
 app.use(express.json()); // Asegúrate de usar un middleware para parsear el cuerpo de las solicitudes JSON
 connectDB();
 
-
 const port = process.env.PORT || 5000;
 const router = express.Router();
 
