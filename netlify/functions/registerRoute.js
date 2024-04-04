@@ -1,8 +1,16 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const User = require("../../src/Pages/User"); // Asegúrate de que esta ruta sea correcta
-
+const cors = require("cors");
 const router = express.Router();
+const connectDB = require("../../mongodb");
+const serverless = require("serverless-http");
+
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+connectDB();
 
 router.post("/register", async (req, res) => {
  const { name, email, password } = req.body;
@@ -34,4 +42,4 @@ router.post("/register", async (req, res) => {
  }
 });
 
-module.exports = router;
+module.exports.handler = serverless(app);
