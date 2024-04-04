@@ -2,8 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
 const awsServerlessExpress = require('aws-serverless-express');
+const cors = require('cors');
+
 
 const app = express();
+
+app.use(cors());
 app.use(bodyParser.json());
 
 const client = new MongoClient(process.env.MONGODB_URI);
