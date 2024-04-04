@@ -112,7 +112,7 @@ const Register = () => {
     setSnackbarOpen(false);
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     // Verificar la conexión a Internet
     if (!navigator.onLine) {
       // No hay conexión, mostrar mensaje de error en rojo
@@ -162,42 +162,38 @@ const Register = () => {
     setEmailError("");
     setUsernameError("");
     setPasswordError("");
-
-    fetch("https://web-chat-online.netlify.app/.netlify/functions/server", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: username,
-        email,
-        password,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("error");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.error) {
-          // Mostrar mensaje de error en azul
-          setSnackbarMessage(data.error);
-          setSnackbarSeverity("info");
-        } else {
-          // Mostrar mensaje de éxito en verde
-          setSnackbarMessage(data.message);
-          setSnackbarSeverity("success");
-        }
-        setSnackbarOpen(true); // Mostrar la alerta instantáneamente
-      })
-      .catch((error) => {
-        // Otro manejo de errores en rojo
-        setSnackbarMessage(error.message);
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true); // Mostrar la alerta instantáneamente
+    try {
+      const response = await fetch("https://web-chat-online.netlify.app/.netlify/functions/server", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: username,
+          email,
+          password,
+        }),
       });
+  
+      if (!response.ok) {
+        throw new Error("Error en la respuesta del servidor");
+      }
+  
+      const data = await response.json();
+  
+      if (data.error) {
+        setSnackbarMessage(data.error);
+        setSnackbarSeverity("info");
+      } else {
+        setSnackbarMessage(data.message);
+        setSnackbarSeverity("success");
+      }
+      setSnackbarOpen(true);
+   } catch (error) {
+      setSnackbarMessage(error.message);
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+   }
   };
 
   return (
