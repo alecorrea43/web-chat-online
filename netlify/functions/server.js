@@ -1,7 +1,7 @@
-import express from "express";
-import cors from "cors";
-import serverless from "serverless-http";
-import Register from "../../src/Pages/register"
+const express = require("express");
+const cors = require("cors");
+const serverless = require("serverless-http");
+const Register = require("../../src/Pages/register");
 
 const app = express();
 app.use(cors());
