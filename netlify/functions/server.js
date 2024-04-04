@@ -11,7 +11,7 @@ connectDB();
 
 app.use("/", registerRoute); // Usa la ruta /register importada
 
-const port = process.env.PORT || 5000;
+
 
 // Exporta la función handler usando CommonJS
 module.exports.handler = serverless(app);
