@@ -13,11 +13,11 @@ let transporter = nodemailer.createTransport({
    
    exports.handler = async (event, context) => {
        const uri = process.env.MONGODB_URI; // Asegúrate de tener esta variable de entorno configurada
-       const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+       const client = new MongoClient(uri);
    
        try {
            await client.connect();
-           const db = client.db("test"); // Asegúrate de reemplazar "nombreDeTuBaseDeDatos" con el nombre real de tu base de datos
+           // Asegúrate de reemplazar "nombreDeTuBaseDeDatos" con el nombre real de tu base de datos
    
            const userData = JSON.parse(event.body);
            const existingUser = await User.findOne({ $or: [{ name: userData.name }, { email: userData.email }] });
