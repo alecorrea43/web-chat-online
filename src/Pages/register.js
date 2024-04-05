@@ -182,9 +182,11 @@ const Register = () => {
       const data = await response.json();
   
       if (data.error) {
-        setSnackbarMessage(data.error);
-        setSnackbarSeverity("info");
-      } else {
+    // Verificar si el mensaje de error es sobre un nombre de usuario o correo ya existente
+    const isUsernameOrEmailError = data.error.includes("ya está en uso") || data.error.includes("ya ha sido registrado");
+    setSnackbarMessage(data.error);
+    setSnackbarSeverity(isUsernameOrEmailError ? "info" : "error"); // Cambiar a "info" si es un error específico de usuario o correo
+  } else {
         setSnackbarMessage(data.message);
         setSnackbarSeverity("success");
       }
