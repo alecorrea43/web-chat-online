@@ -1,6 +1,5 @@
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
-const User = require('../../src/Pages/User'); // Asegúrate de ajustar la ruta al modelo de usuario
 
 exports.handler = async (event, context) => {
     const uri = process.env.MONGODB_URI; // Asegúrate de tener esta variable de entorno configurada
@@ -8,19 +7,16 @@ exports.handler = async (event, context) => {
 
     try {
         await client.connect();
-        const db = client.db("test"); // Asegúrate de reemplazar "nombreDeTuBaseDeDatos" con el nombre real de tu base de datos
+        const collection = client.db("test").collection("users");
+        const userData = JSON.parse(event.body);
 
         // Cifrar la contraseña antes de guardarla
         const saltRounds = 10; // Número de rondas para el cifrado
-        const userData = JSON.parse(event.body);
         const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
         userData.password = hashedPassword; // Reemplazar la contraseña en texto plano con la cifrada
 
-        // Crear un nuevo usuario utilizando el modelo de Mongoose
-        const newUser = new User(userData);
-        await newUser.save();
-
-        console.log(`Usuario insertado con el _id: ${newUser._id}`);
+        const result = await collection.insertOne(userData);
+        console.log(`Usuario insertado con el _id: ${result.insertedId}`);
     } catch (e) {
         console.error(e);
         return {
