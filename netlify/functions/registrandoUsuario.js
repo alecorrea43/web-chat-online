@@ -8,12 +8,15 @@ exports.handler = async (event, context) => {
     try {
         await client.connect();
         const collection = client.db("test").collection("users");
-        const userData = JSON.parse(event.body);
+        let userData = JSON.parse(event.body);
 
         // Cifrar la contraseña antes de guardarla
         const saltRounds = 10; // Número de rondas para el cifrado
         const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
         userData.password = hashedPassword; // Reemplazar la contraseña en texto plano con la cifrada
+
+        // Agregar el campo 'connected' con valor predeterminado de false
+        userData.connected = false;
 
         const result = await collection.insertOne(userData);
         console.log(`Usuario insertado con el _id: ${result.insertedId}`);
