@@ -1,80 +1,82 @@
 const { MongoClient } = require('mongodb');
-const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 exports.handler = async (event, context) => {
-    const uri = process.env.MONGODB_URI; // Asegúrate de tener esta variable de entorno configurada
+    // Asegúrate de que el evento es una solicitud POST
+    if (event.httpMethod !== "POST") {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ message: "Método no permitido" }),
+        };
+    }
+
+    // Parsear el cuerpo de la solicitud para obtener el correo electrónico
+    const { email } = JSON.parse(event.body);
+
+    if (!email) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: "El campo de correo electrónico es obligatorio." }),
+        };
+    }
+
+    const uri = process.env.MONGODB_URI;
     const client = new MongoClient(uri);
 
     try {
         await client.connect();
-        const collection = client.db("test").collection("users");
-        let userData = JSON.parse(event.body);
+        const recoveryTokensCollection = client.db("test").collection("recoveryTokens");
 
-        // Verificar si el nombre de usuario o el correo electrónico ya existen
-        const existingUser = await collection.findOne({
-            $or: [
-                { name: userData.name },
-                { email: userData.email }
-            ]
+        // Generar un token de recuperación
+        const token = crypto.randomBytes(32).toString("hex");
+        const expirationTime = new Date(Date.now() + 3600000); // 1 hora en el futuro
+
+        // Almacenar el token de recuperación en la base de datos
+        await recoveryTokensCollection.insertOne({
+            email,
+            token,
+            expirationTime
         });
 
-        if (existingUser) {
-            // Si el usuario ya existe, devolver un mensaje de error
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    error: existingUser.name === userData.name
-                        ? "El nombre de usuario ya está en uso, elige otro."
-                        : "El correo ya ha sido registrado, crea otro o inicia sesión.",
-                }),
-            };
-        }
-
-        // Cifrar la contraseña antes de guardarla
-        const saltRounds = 10; // Número de rondas para el cifrado
-        const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
-        userData.password = hashedPassword; // Reemplazar la contraseña en texto plano con la cifrada
-
-        // Agregar el campo 'connected' con valor predeterminado de false
-        userData.connected = false;
-
-        const result = await collection.insertOne(userData);
-        console.log(`Usuario insertado con el _id: ${result.insertedId}`);
-
-
+        // Enviar el correo electrónico con el enlace de recuperación
+        const resetPasswordLink = `${process.env.BASE_URL}/reset-password/${token}`;
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            service: "gmail",
+            port: 587,
             auth: {
-                user: process.env.GMAIL_USERNAME, // Utiliza la variable de entorno
-                pass: process.env.GMAIL_PASSWORD // Utiliza la variable de entorno
-            }
+                user: process.env.GMAIL_USERNAME,
+                pass: process.env.GMAIL_PASSWORD,
+            },
         });
 
-        // Opciones del correo
-        const mailOptions = {
+        const msg = {
+            to: email,
             from: process.env.GMAIL_USERNAME,
-            to: userData.email,
-            subject: 'Bienvenido a nuestra página web',
-            text: `Hola ${userData.name}, gracias por registrarte en nuestra página web. ¡Esperamos que disfrutes de nuestros servicios!`,
-           
+            subject: "Recuperación de Contraseña",
+            text: `Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: ${resetPasswordLink}`,
+            html: `<p>Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: <a href="${resetPasswordLink}">Restablecer Contraseña</a></p>`,
         };
 
-        // Enviar el correo
-        await transporter.sendMail(mailOptions);
+        try {
+            await transporter.sendMail(msg);
+            console.log("Correo electrónico de recuperación enviado exitosamente.");
+        } catch (error) {
+            console.error("Error al enviar el correo electrónico de recuperación:", error);
+            throw new Error("Error al enviar el correo electrónico de recuperación.");
+        }
 
-    } catch (e) {
-        console.error(e);
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Solicitud de recuperación de contraseña procesada exitosamente." }),
+        };
+    } catch (error) {
+        console.error("Error al procesar la solicitud de recuperación de contraseña:", error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: "Error al insertar el usuario" }),
+            body: JSON.stringify({ message: "Error al procesar la solicitud de recuperación de contraseña." }),
         };
     } finally {
         await client.close();
     }
-
-    return {
-        statusCode: 200,
-        body: JSON.stringify({ message: "Usuario registrado exitosamente" }),
-    };
 };
