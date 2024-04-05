@@ -2,7 +2,25 @@ const { MongoClient } = require('mongodb');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
-async function handlePasswordRecoveryRequest(email) {
+exports.handler = async (event, context) => {
+    // Asegúrate de que el evento es una solicitud POST
+    if (event.httpMethod !== "POST") {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ message: "Método no permitido" }),
+        };
+    }
+
+    // Parsear el cuerpo de la solicitud para obtener el correo electrónico
+    const { email } = JSON.parse(event.body);
+
+    if (!email) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: "El campo de correo electrónico es obligatorio." }),
+        };
+    }
+
     const uri = process.env.MONGODB_URI;
     const client = new MongoClient(uri);
 
@@ -22,41 +40,43 @@ async function handlePasswordRecoveryRequest(email) {
         });
 
         // Enviar el correo electrónico con el enlace de recuperación
-        await sendRecoveryEmail(email, token);
+        const resetPasswordLink = `${process.env.BASE_URL}/reset-password/${token}`;
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            port: 587,
+            auth: {
+                user: process.env.GMAIL_USERNAME,
+                pass: process.env.GMAIL_PASSWORD,
+            },
+        });
 
-        console.log("Solicitud de recuperación de contraseña procesada exitosamente.");
+        const msg = {
+            to: email,
+            from: process.env.GMAIL_USERNAME,
+            subject: "Recuperación de Contraseña",
+            text: `Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: ${resetPasswordLink}`,
+            html: `<p>Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: <a href="${resetPasswordLink}">Restablecer Contraseña</a></p>`,
+        };
+
+        try {
+            await transporter.sendMail(msg);
+            console.log("Correo electrónico de recuperación enviado exitosamente.");
+        } catch (error) {
+            console.error("Error al enviar el correo electrónico de recuperación:", error);
+            throw new Error("Error al enviar el correo electrónico de recuperación.");
+        }
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Solicitud de recuperación de contraseña procesada exitosamente." }),
+        };
     } catch (error) {
         console.error("Error al procesar la solicitud de recuperación de contraseña:", error);
-        throw new Error("Error al procesar la solicitud de recuperación de contraseña.");
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: "Error al procesar la solicitud de recuperación de contraseña." }),
+        };
     } finally {
         await client.close();
     }
-}
-
-async function sendRecoveryEmail(email, token) {
-    const resetPasswordLink = `${process.env.BASE_URL}/reset-password/${token}`;
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        port: 587,
-        auth: {
-            user: process.env.GMAIL_USERNAME,
-            pass: process.env.GMAIL_PASSWORD,
-        },
-    });
-
-    const msg = {
-        to: email,
-        from: process.env.GMAIL_USERNAME,
-        subject: "Recuperación de Contraseña",
-        text: `Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: ${resetPasswordLink}`,
-        html: `<p>Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: <a href="${resetPasswordLink}">Restablecer Contraseña</a></p>`,
-    };
-
-    try {
-        await transporter.sendMail(msg);
-        console.log("Correo electrónico de recuperación enviado exitosamente.");
-    } catch (error) {
-        console.error("Error al enviar el correo electrónico de recuperación:", error);
-        throw new Error("Error al enviar el correo electrónico de recuperación.");
-    }
-}
+};
