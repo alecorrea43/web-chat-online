@@ -7,4 +7,7 @@ to = "/.netlify/functions/:splat"
 status = 200
 
 
-/*    /index.html   200
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
