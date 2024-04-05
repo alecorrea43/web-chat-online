@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
 const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const client = new MongoClient(uri);
 
 exports.handler = async (event, context) => {
     if (event.httpMethod !== "POST" && event.httpMethod !== "PUT") {
