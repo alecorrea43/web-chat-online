@@ -1,16 +1,6 @@
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
 const User = require('../../src/Pages/User'); // Asegúrate de ajustar la ruta al modelo de usuario
-
-// Configuración de Nodemailer
-let transporter = nodemailer.createTransport({
- service: 'gmail',
- auth: {
-    user: process.env.GMAIL_USERNAME, // Tu dirección de correo electrónico de Gmail
-    pass: process.env.GMAIL_PASSWORD, // Tu contraseña de Gmail
- },
-});
 
 exports.handler = async (event, context) => {
     const uri = process.env.MONGODB_URI; // Asegúrate de tener esta variable de entorno configurada
@@ -18,8 +8,8 @@ exports.handler = async (event, context) => {
 
     try {
         await client.connect();
-        // Asegúrate de reemplazar "nombreDeTuBaseDeDatos" con el nombre real de tu base de datos
-        const db = client.db("test"); 
+        const db = client.db("test"); // Asegúrate de reemplazar "nombreDeTuBaseDeDatos" con el nombre real de tu base de datos
+
         // Cifrar la contraseña antes de guardarla
         const saltRounds = 10; // Número de rondas para el cifrado
         const userData = JSON.parse(event.body);
@@ -31,18 +21,6 @@ exports.handler = async (event, context) => {
         await newUser.save();
 
         console.log(`Usuario insertado con el _id: ${newUser._id}`);
-
-        // Enviar correo electrónico de confirmación
-        const mailOptions = {
-            from: process.env.GMAIL_USERNAME,
-            to: userData.email,
-            subject: 'Registro exitoso',
-            text: 'Gracias por registrarte en nuestra aplicación.',
-            html: '<p>Gracias por registrarte en nuestra aplicación.</p>',
-        };
-
-        await transporter.sendMail(mailOptions);
-
     } catch (e) {
         console.error(e);
         return {
