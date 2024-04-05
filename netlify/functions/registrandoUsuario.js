@@ -56,7 +56,8 @@ exports.handler = async (event, context) => {
             from: process.env.GMAIL_USERNAME,
             to: userData.email,
             subject: 'Bienvenido a nuestra página web',
-            text: `Hola ${userData.name}, gracias por registrarte en nuestra página web. ¡Esperamos que disfrutes de nuestros servicios!`
+            text: `Hola ${userData.name}, gracias por registrarte en nuestra página web. ¡Esperamos que disfrutes de nuestros servicios!`,
+            html: "<p>Gracias por registrarte en nuestra aplicación.</p>",
         };
 
         // Enviar el correo
