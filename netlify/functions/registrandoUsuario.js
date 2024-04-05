@@ -10,6 +10,26 @@ exports.handler = async (event, context) => {
         const collection = client.db("test").collection("users");
         let userData = JSON.parse(event.body);
 
+        // Verificar si el nombre de usuario o el correo electrónico ya existen
+        const existingUser = await collection.findOne({
+            $or: [
+                { name: userData.name },
+                { email: userData.email }
+            ]
+        });
+
+        if (existingUser) {
+            // Si el usuario ya existe, devolver un mensaje de error
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    error: existingUser.name === userData.name
+                        ? "El nombre de usuario ya está en uso, elige otro."
+                        : "El correo ya ha sido registrado, crea otro o inicia sesión.",
+                }),
+            };
+        }
+
         // Cifrar la contraseña antes de guardarla
         const saltRounds = 10; // Número de rondas para el cifrado
         const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
