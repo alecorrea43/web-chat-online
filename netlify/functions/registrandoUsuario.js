@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 
 exports.handler = async (event, context) => {
     const uri = process.env.MONGODB_URI; // Asegúrate de tener esta variable de entorno configurada
@@ -40,6 +41,27 @@ exports.handler = async (event, context) => {
 
         const result = await collection.insertOne(userData);
         console.log(`Usuario insertado con el _id: ${result.insertedId}`);
+
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.GMAIL_USERNAME, // Utiliza la variable de entorno
+                pass: process.env.GMAIL_PASSWORD // Utiliza la variable de entorno
+            }
+        });
+
+        // Opciones del correo
+        const mailOptions = {
+            from: process.env.GMAIL_USERNAME,
+            to: userData.email,
+            subject: 'Bienvenido a nuestra página web',
+            text: `Hola ${userData.name}, gracias por registrarte en nuestra página web. ¡Esperamos que disfrutes de nuestros servicios!`
+        };
+
+        // Enviar el correo
+        await transporter.sendMail(mailOptions);
+
     } catch (e) {
         console.error(e);
         return {
