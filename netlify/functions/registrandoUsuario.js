@@ -21,7 +21,7 @@ exports.handler = async (event, context) => {
         if (existingUser) {
             // Si el usuario ya existe, devolver un mensaje de error
             return {
-                statusCode: 400,
+                statusCode: 200,
                 body: JSON.stringify({
                     error: existingUser.name === userData.name
                         ? "El nombre de usuario ya está en uso, elige otro."
