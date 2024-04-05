@@ -17,7 +17,7 @@ let transporter = nodemailer.createTransport({
    
        try {
            await client.connect();
-           // Asegúrate de reemplazar "nombreDeTuBaseDeDatos" con el nombre real de tu base de datos
+           const db = client.db("test"); // Asegúrate de reemplazar "nombreDeTuBaseDeDatos" con el nombre real de tu base de datos
    
            const userData = JSON.parse(event.body);
            const existingUser = await User.findOne({ $or: [{ name: userData.name }, { email: userData.email }] });
