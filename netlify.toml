@@ -7,4 +7,4 @@ to = "/.netlify/functions/:splat"
 status = 200
 
 
-/forgot-password /index.html 200
+/*    /index.html   200
