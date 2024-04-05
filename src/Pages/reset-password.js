@@ -79,7 +79,7 @@ const ResetPassword = () => {
           return;
         }
 
-        const response = await fetch(`http://localhost:3001/reset-password/${token}`);
+        const response = await fetch(`/.netlify/functions/restePassword/${token}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -113,7 +113,7 @@ const ResetPassword = () => {
     }
   
     try {
-      const response = await fetch(`http://localhost:3001/reset-password/${token}`, {
+      const response = await fetch(`/.netlify/functions/restePassword/${token}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
