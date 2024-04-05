@@ -428,8 +428,7 @@ async function checkExistingRequest(email) {
 
 
 // Modificación en app.post('/reset-password', ...)
-app
-  .route("/reset-password/:token")
+app.post("/reset-password/:token")
   .get(async (req, res) => {
     const { token } = req.params;
     console.log("Valor de token (desde la ruta):", token);
