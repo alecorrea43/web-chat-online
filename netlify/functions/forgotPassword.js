@@ -40,7 +40,7 @@ exports.handler = async (event, context) => {
         });
 
         // Enviar el correo electrónico con el enlace de recuperación
-        const resetPasswordLink = `/.netlify/functions/restePassword/${token}`;
+        const resetPasswordLink = `/.netlify/functions/restePassword/reset-password/${token}`;
         const transporter = nodemailer.createTransport({
             service: "gmail",
             port: 587,
