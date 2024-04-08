@@ -8,7 +8,7 @@ exports.handler = async (event, context) => {
     const { token } = event.queryStringParameters;
 
     if (!token) {
-        return { statusCode: 400, body: "Token is required" };
+        return { statusCode: 400, body: JSON.stringify({ error: "Token is required" }) };
     }
 
     const uri = process.env.MONGODB_URI;
