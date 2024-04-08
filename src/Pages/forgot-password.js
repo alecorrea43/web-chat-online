@@ -191,14 +191,18 @@ const ForgotPassword = () => {
             setEmail(e.target.value);
             setEmailError("");
           }}
-          
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              handleForgotPassword();
+            }
+         }}
           error={!!emailError}
           helperText={emailError}
         />
 
         <Button
         className="cssButton"
-          type="submit"
+          type="button"
           fullWidth
           variant="contained"
           color="primary"
