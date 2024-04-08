@@ -69,7 +69,6 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
 
-
   useEffect(() => {
     const validateToken = async () => {
       try {
@@ -232,7 +231,9 @@ const ResetPassword = () => {
                 fullWidth
                 required
                 error={passwordMismatchError} // Indica si hay un error
- helperText={passwordMismatchError ? "Las contraseñas no coinciden." : ""}
+                helperText={
+                  passwordMismatchError ? "Las contraseñas no coinciden." : ""
+                }
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
