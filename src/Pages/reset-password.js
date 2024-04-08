@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
   Typography,
   TextField,
@@ -9,15 +9,15 @@ import {
   Box,
   IconButton,
   InputAdornment,
-} from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import "./styles/estiloReset.css";
 
 const StyledContainer = styled(Box)({
   display: "flex",
   width: "100%",
-  height:"100vh",
+  height: "100vh",
   marginLeft: "auto",
   marginRight: "auto",
   boxSizing: "border-box",
@@ -33,14 +33,13 @@ const StyledContainer = styled(Box)({
 });
 const StyledFormContainer = styled("div")({
   width: "75%",
-  height:"80%",
+  height: "80%",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
- backgroundColor:"#ffffff",
+  backgroundColor: "#ffffff",
   "@media (max-width: 768px)": {
     width: "100%",
-   
   },
 });
 const StyledFormContainerBox = styled("div")({
@@ -51,45 +50,52 @@ const StyledFormContainerBox = styled("div")({
   justifyContent: "center",
   "@media (max-width: 768px)": {
     width: "95%",
-  }
+  },
 });
 const StyledTitle = styled(Typography)({
   textAlign: "center",
   marginBottom: "30px",
 });
 
-
-
 const ResetPassword = () => {
   const { token } = useParams();
-  const [newPassword, setNewPassword] = useState('');
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [userEmail, setUserEmail] = useState('');
+  const [newPassword, setNewPassword] = useState("");
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [shouldClose, setShouldClose] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordMismatchError, setPasswordMismatchError] = useState(false);
+
 
   useEffect(() => {
     const validateToken = async () => {
       try {
         if (!token) {
-          setError('Token no definido. Asegúrate de proporcionar un token válido.');
+          setError(
+            "Token no definido. Asegúrate de proporcionar un token válido."
+          );
           return;
         }
 
-        const response = await fetch(`/.netlify/functions/validToken?token=${token}`);
+        const response = await fetch(
+          `/.netlify/functions/validToken?token=${token}`
+        );
         const data = await response.json();
-  
+
         if (response.ok) {
           setUserEmail(data.email);
         } else {
-          setError(data.error || 'Ha ocurrido un error al obtener la información del usuario.');
+          setError(
+            data.error ||
+              "Ha ocurrido un error al obtener la información del usuario."
+          );
         }
       } catch (error) {
-        console.error('Error al obtener información del usuario:', error);
-        setError('Ha ocurrido un error al obtener la información del usuario.');
+        console.error("Error al obtener información del usuario:", error);
+        setError("Ha ocurrido un error al obtener la información del usuario.");
       }
     };
 
@@ -98,48 +104,56 @@ const ResetPassword = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-  
+
     // Validación de espacios en la contraseña
-    if (newPassword.includes(' ')) {
-      setError('La nueva contraseña no puede contener espacios.');
+    if (newPassword.includes(" ")) {
+      setError("La nueva contraseña no puede contener espacios.");
       setOpenSnackbar(true);
       return;
     }
-  
+
     if (newPassword.length < 6) {
-      setError('La nueva contraseña debe tener al menos 6 caracteres.');
+      setError("La nueva contraseña debe tener al menos 6 caracteres.");
       setOpenSnackbar(true);
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
+      setPasswordMismatchError(true);
+      setError("Las contraseñas no coinciden.");
       setOpenSnackbar(true);
       return;
-   }
-  
+    }
+
     try {
-      const response = await fetch(`/.netlify/functions/restePassword/${token}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ token, newPassword  })
-      });
-  
+      const response = await fetch(
+        `/.netlify/functions/restePassword/${token}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token, newPassword }),
+        }
+      );
+
       const data = await response.json();
-  
+
       if (response.ok) {
         setSuccessMessage(data.message); // Usa el mensaje del servidor
-        setError(''); 
+        setError("");
         setOpenSnackbar(true);
         setShouldClose(true);
-      
       } else {
-        setError(data.error || 'Ha ocurrido un error al restablecer tu contraseña. Por favor, inténtalo de nuevo más tarde.');
+        setError(
+          data.error ||
+            "Ha ocurrido un error al restablecer tu contraseña. Por favor, inténtalo de nuevo más tarde."
+        );
         setOpenSnackbar(true);
       }
     } catch (error) {
-      setError('Ha ocurrido un error en la solicitud. Por favor, inténtalo de nuevo más tarde.');
+      setError(
+        "Ha ocurrido un error en la solicitud. Por favor, inténtalo de nuevo más tarde."
+      );
       setOpenSnackbar(true);
     }
   };
@@ -159,82 +173,90 @@ const ResetPassword = () => {
     }
   }, [shouldClose]);
 
-
   return (
     <StyledContainer component="main" maxWidth="xl">
-    <StyledFormContainer>
-       <StyledFormContainerBox>
-         <StyledTitle className="main-title">
-           Restablece tu contraceña
-         </StyledTitle>
-         <StyledTitle className="main-text"> 
-           Introduzca la nueva contraceña.
-         </StyledTitle>
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={6000}
-          onClose={handleSnackbarClose}
-        >
-          <Alert
-            severity={error ? 'error' : 'success'}
+      <StyledFormContainer>
+        <StyledFormContainerBox>
+          <StyledTitle className="main-title">
+            Restablece tu contraceña
+          </StyledTitle>
+          <StyledTitle className="main-text">
+            Introduzca la nueva contraceña.
+          </StyledTitle>
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={6000}
             onClose={handleSnackbarClose}
           >
-            {error || successMessage}
-          </Alert>
-        </Snackbar>
-        {userEmail && (
- <form onSubmit={handleResetPassword} style={{ width: '100%', marginTop: '8px' }}>
-    <TextField
-      className="miClasePersonalizada"
-      label="Nueva Contraseña"
-      type={showPassword ? 'text' : 'password'}
-      value={newPassword}
-      onChange={(e) => setNewPassword(e.target.value)}
-      margin="normal"
-      fullWidth
-      required
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="end">
-            <IconButton
-              onClick={() => setShowPassword(!showPassword)}
-              edge="end"
+            <Alert
+              severity={error ? "error" : "success"}
+              onClose={handleSnackbarClose}
             >
-              {showPassword ? <VisibilityOff /> : <Visibility />}
-            </IconButton>
-          </InputAdornment>
-        ),
-      }}
-    />
-    <TextField
-      className="miClasePersonalizada"
-      label="Confirmar Contraseña"
-      type={showPassword ? 'text' : 'password'}
-      value={confirmPassword}
-      onChange={(e) => setConfirmPassword(e.target.value)}
-      margin="normal"
-      fullWidth
-      required
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="end">
-            <IconButton
-              onClick={() => setShowPassword(!showPassword)}
-              edge="end"
+              {error || successMessage}
+            </Alert>
+          </Snackbar>
+          {userEmail && (
+            <form
+              onSubmit={handleResetPassword}
+              style={{ width: "100%", marginTop: "8px" }}
             >
-              {showPassword ? <VisibilityOff /> : <Visibility />}
-            </IconButton>
-          </InputAdornment>
-        ),
-      }}
-    />
-    <Button
-      className="cssButton" type="submit" variant="contained" style={{ width: '100%'}}>
-      Restablecer Contraseña
-    </Button>
- </form>
-)}
-      </StyledFormContainerBox>
+              <TextField
+                className="miClasePersonalizada"
+                label="Nueva Contraseña"
+                type={showPassword ? "text" : "password"}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                margin="normal"
+                fullWidth
+                required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                className="miClasePersonalizada"
+                label="Confirmar Contraseña"
+                type={showPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                margin="normal"
+                fullWidth
+                required
+                error={passwordMismatchError} // Indica si hay un error
+ helperText={passwordMismatchError ? "Las contraseñas no coinciden." : ""}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button
+                className="cssButton"
+                type="submit"
+                variant="contained"
+                style={{ width: "100%" }}
+              >
+                Restablecer Contraseña
+              </Button>
+            </form>
+          )}
+        </StyledFormContainerBox>
       </StyledFormContainer>
     </StyledContainer>
   );
