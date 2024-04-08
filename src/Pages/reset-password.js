@@ -119,7 +119,7 @@ const ResetPassword = () => {
     if (newPassword !== confirmPassword) {
       setPasswordMismatchError(true);
       setError("Las contraseñas no coinciden.");
-      setOpenSnackbar(true);
+      setOpenSnackbar(false);
       return;
     }
 
