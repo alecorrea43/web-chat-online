@@ -70,6 +70,13 @@ const ResetPassword = () => {
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
 
   useEffect(() => {
+    setPasswordMismatchError(false);
+    setError(""); // También es una buena práctica resetear el mensaje de error general
+ }, [newPassword, confirmPassword]);
+
+
+
+  useEffect(() => {
     const validateToken = async () => {
       try {
         if (!token) {
