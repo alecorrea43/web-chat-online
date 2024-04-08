@@ -72,7 +72,7 @@ const ResetPassword = () => {
   
 
   useEffect(() => {
-    const fetchUserEmail = async () => {
+    const validateToken = async () => {
       try {
         if (!token) {
           setError('Token no definido. Asegúrate de proporcionar un token válido.');
@@ -93,7 +93,7 @@ const ResetPassword = () => {
       }
     };
 
-    fetchUserEmail();
+    validateToken();
   }, [token]);
 
   const handleResetPassword = async (e) => {
