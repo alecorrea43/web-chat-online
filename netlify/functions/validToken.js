@@ -1,49 +1,42 @@
 const { MongoClient } = require('mongodb');
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
 
-async function validateAndAssociateToken(token) {
+exports.handler = async (event, context) => {
+    if (event.httpMethod !== "GET") {
+        return { statusCode: 405, body: "Method Not Allowed" };
+    }
+
+    const { token } = event.queryStringParameters;
+
+    if (!token) {
+        return { statusCode: 400, body: "Token is required" };
+    }
+
+    const uri = process.env.MONGODB_URI;
+    const client = new MongoClient(uri);
+
     try {
         await client.connect();
         const recoveryTokensCollection = client.db("test").collection("recoveryTokens");
-        const userToken = await recoveryTokensCollection.findOne({ token });
 
-        if (!userToken) {
-            return { isValid: false, message: "Token de recuperación inválido." };
+        const tokenData = await recoveryTokensCollection.findOne({ token });
+
+        if (!tokenData) {
+            return { statusCode: 404, body: "Token not found" };
         }
 
-        // Verificar si el token ha expirado
         const currentTime = new Date();
-        if (currentTime > userToken.expiration_time) {
-            return { isValid: false, message: "El token de recuperación ha expirado." };
+        if (currentTime > tokenData.expirationTime) {
+            return { statusCode: 400, body: "Token a expirado" };
         }
 
-        // El token es válido, devolver la información del usuario
-        return { isValid: true, user: userToken };
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ email: tokenData.email })
+        };
     } catch (error) {
-        console.error("Error al validar y asociar el token:", error);
-        return { isValid: false, message: "Ha ocurrido un error al validar y asociar el token." };
+        console.error("Error connecting to MongoDB:", error);
+        return { statusCode: 500, body: "Internal server error" };
     } finally {
         await client.close();
     }
-}
-
-exports.handler = async (event, context) => {
-    // Extraer el token del cuerpo de la solicitud
-    const { token } = JSON.parse(event.body);
-
-    // Validar y asociar el token
-    const validationResult = await validateAndAssociateToken(token);
-    if (!validationResult.isValid) {
-        return {
-            statusCode: 401,
-            body: JSON.stringify({ error: validationResult.message })
-        };
-    }
-
-    // Si el token es válido, devolver la información del usuario
-    return {
-        statusCode: 200,
-        body: JSON.stringify({ email: validationResult.user.email })
-    };
 };

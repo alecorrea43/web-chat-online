@@ -1,55 +1,49 @@
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
 
 exports.handler = async (event, context) => {
-    if (event.httpMethod !== "POST" && event.httpMethod !== "PUT") {
+    if (event.httpMethod !== "PUT") {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
 
     const { token, newPassword } = JSON.parse(event.body);
 
+    if (!token || !newPassword) {
+        return { statusCode: 400, body: "Token and new password are required" };
+    }
+
+    const uri = process.env.MONGODB_URI;
+    const client = new MongoClient(uri);
+
     try {
         await client.connect();
-        const recoveryTokensCollection = client.db("test").collection("recoveryTokens");
-        const userToken = await recoveryTokensCollection.findOne({ token });
-
-        if (!userToken) {
-            return {
-                statusCode: 401,
-                body: JSON.stringify({ error: "Token de recuperación inválido." })
-            };
-        }
-
         const usersCollection = client.db("test").collection("users");
+        const recoveryTokensCollection = client.db("test").collection("recoveryTokens");
 
-        if (event.httpMethod === "POST") {
-            // Obtener información del usuario asociada al token
-            const user = await usersCollection.findOne({ email: userToken.email });
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ email: user.email })
-            };
-        } else if (event.httpMethod === "PUT") {
-            // Actualizar la contraseña del usuario
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
-            await usersCollection.updateOne({ email: userToken.email }, { $set: { password: hashedPassword } });
+        const tokenData = await recoveryTokensCollection.findOne({ token });
 
-            // Eliminar el token de recuperación
-            await recoveryTokensCollection.deleteOne({ token });
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ message: "Contraseña restablecida exitosamente y token eliminado." })
-            };
+        if (!tokenData) {
+            return { statusCode: 404, body: "Token not found" };
         }
-    } catch (error) {
-        console.error("Error al procesar la solicitud:", error);
+
+        const currentTime = new Date();
+        if (currentTime > tokenData.expirationTime) {
+            return { statusCode: 400, body: "Token has expired" };
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await usersCollection.updateOne({ email: tokenData.email }, { $set: { password: hashedPassword } });
+
+        await recoveryTokensCollection.deleteOne({ token });
+
         return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "Ha ocurrido un error en el servidor. Por favor, inténtalo de nuevo." })
+            statusCode: 200,
+            body: JSON.stringify({ message: "Password reset successfully" })
         };
+    } catch (error) {
+        console.error("Error connecting to MongoDB:", error);
+        return { statusCode: 500, body: "Internal server error" };
     } finally {
         await client.close();
     }
