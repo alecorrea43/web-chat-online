@@ -79,7 +79,7 @@ const ResetPassword = () => {
           return;
         }
 
-        const response = await fetch(`/.netlify/functions/restePassword/${token}`);
+        const response = await fetch(`/.netlify/functions/validToken/${token}`);
         const data = await response.json();
 
         if (response.ok) {
