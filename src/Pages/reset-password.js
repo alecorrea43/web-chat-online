@@ -69,7 +69,7 @@ const ResetPassword = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [shouldClose, setShouldClose] = useState(false);
-  
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   useEffect(() => {
     const validateToken = async () => {
@@ -111,6 +111,11 @@ const ResetPassword = () => {
       setOpenSnackbar(true);
       return;
     }
+    if (newPassword !== confirmPassword) {
+      setError('Las contraseñas no coinciden.');
+      setOpenSnackbar(true);
+      return;
+   }
   
     try {
       const response = await fetch(`/.netlify/functions/restePassword/${token}`, {
@@ -178,35 +183,57 @@ const ResetPassword = () => {
           </Alert>
         </Snackbar>
         {userEmail && (
-          <form onSubmit={handleResetPassword} style={{ width: '100%', marginTop: '8px' }}>
-            <TextField
-            className="miClasePersonalizada"
-              label="Nueva Contraseña"
-              type={showPassword ? 'text' : 'password'}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              margin="normal"
-              fullWidth
-              required
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Button
-            className="cssButton" type="submit" variant="contained" style={{ width: '100%'}}>
-              Restablecer Contraseña
-            </Button>
-          </form>
-        )}
+ <form onSubmit={handleResetPassword} style={{ width: '100%', marginTop: '8px' }}>
+    <TextField
+      className="miClasePersonalizada"
+      label="Nueva Contraseña"
+      type={showPassword ? 'text' : 'password'}
+      value={newPassword}
+      onChange={(e) => setNewPassword(e.target.value)}
+      margin="normal"
+      fullWidth
+      required
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              onClick={() => setShowPassword(!showPassword)}
+              edge="end"
+            >
+              {showPassword ? <VisibilityOff /> : <Visibility />}
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+    />
+    <TextField
+      className="miClasePersonalizada"
+      label="Confirmar Contraseña"
+      type={showPassword ? 'text' : 'password'}
+      value={confirmPassword}
+      onChange={(e) => setConfirmPassword(e.target.value)}
+      margin="normal"
+      fullWidth
+      required
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              onClick={() => setShowPassword(!showPassword)}
+              edge="end"
+            >
+              {showPassword ? <VisibilityOff /> : <Visibility />}
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+    />
+    <Button
+      className="cssButton" type="submit" variant="contained" style={{ width: '100%'}}>
+      Restablecer Contraseña
+    </Button>
+ </form>
+)}
       </StyledFormContainerBox>
       </StyledFormContainer>
     </StyledContainer>
