@@ -26,6 +26,11 @@ exports.handler = async (event, context) => {
             return { statusCode: 404, body: "Token not found" };
         }
 
+        if (tokenData.used) {
+            return { statusCode: 400, body: JSON.stringify({ error: "Recovery password token has already been used" }) };
+        }
+
+
         const currentTime = new Date();
         if (currentTime > tokenData.expirationTime) {
             return { statusCode: 400, body: "Token has expired" };
@@ -35,6 +40,8 @@ exports.handler = async (event, context) => {
 
         await usersCollection.updateOne({ email: tokenData.email }, { $set: { password: hashedPassword } });
 
+
+        await recoveryTokensCollection.updateOne({ token }, { $set: { used: true } });
         await recoveryTokensCollection.deleteOne({ token });
 
         return {

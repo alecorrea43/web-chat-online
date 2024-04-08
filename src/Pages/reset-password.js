@@ -124,6 +124,7 @@ const ResetPassword = () => {
       const data = await response.json();
   
       if (response.ok) {
+        setError(data.message);
         setSuccessMessage(data.message); // Usa el mensaje del servidor
         setError(''); 
         setOpenSnackbar(true);
