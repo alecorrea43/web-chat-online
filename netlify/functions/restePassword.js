@@ -9,7 +9,7 @@ exports.handler = async (event, context) => {
     const { token, newPassword } = JSON.parse(event.body);
 
     if (!token || !newPassword) {
-        return { statusCode: 400, body: "Token and new password are required" };
+        return { statusCode: 400, body: JSON.stringify({ error: "Token and new password are required" }) };
     }
 
     const uri = process.env.MONGODB_URI;

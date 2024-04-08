@@ -26,7 +26,7 @@ exports.handler = async (event, context) => {
 
         const currentTime = new Date();
         if (currentTime > tokenData.expirationTime) {
-            return { statusCode: 400, body: "Token a expirado" };
+            return { statusCode: 400, body: JSON.stringify({ error: "Token is required" }) };
         }
 
         return {
