@@ -131,7 +131,7 @@ const Login = () => {
     try {
       setIdentifierError("");
 
-      const response = await fetch("/.netlify/functions/login", {
+      const response = await fetch("http://localhost:3001/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
