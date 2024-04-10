@@ -351,7 +351,7 @@ const Chat = (props) => {
 
   useEffect(() => {
     if (shouldConnect) {
-      const newSocket = io("http://localhost:3001");
+      const newSocket = io("/.netlify/functions/socketServer");
       setSocket(newSocket);
 
       if (newSocket) {
