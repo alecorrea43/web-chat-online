@@ -30,8 +30,16 @@ exports.handler = async function(event, context) {
  // Generar y devolver un token JWT
  const token = jwt.sign({ username: user.name, email: user.email }, process.env.JWT_SECRET, { expiresIn: '24h' });
 
+ // Actualizar el estado de los usuarios conectados en MongoDB
+ await usersCollection.updateOne({ email: user.email }, { $set: { connected: true } });
+
  return {
     statusCode: 200,
-    body: JSON.stringify({ token: token, name: user.name, email: user.email })
+    body: JSON.stringify({ 
+      token, 
+      username: user.name || username,
+      email: user.email,
+      name: user.name 
+    })
  };
 };
