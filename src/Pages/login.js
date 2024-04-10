@@ -147,7 +147,7 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(data.error || "Error en la solicitud");
       }
-      const socket = io("http://localhost:3001");
+      const socket = io("/.netlify/functions/socketServer");
       socket.emit("userConnected", { email: data.email });
       setError("");
 
