@@ -28,7 +28,7 @@ exports.handler = async function(event, context) {
  }
 
  // Generar y devolver un token JWT
- const token = jwt.sign({ username: user.name, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+ const token = jwt.sign({ username: user.name, email: user.email }, process.env.JWT_SECRET, { expiresIn: '24h' });
 
  return {
     statusCode: 200,
