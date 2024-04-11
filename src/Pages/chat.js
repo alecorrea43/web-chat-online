@@ -25,7 +25,6 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import "./styles/Chat.css";
 import io from "socket.io-client";
 import { useAuth } from "./AuthContext";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import SendIcon from "@mui/icons-material/Send";
@@ -742,7 +741,7 @@ const Chat = (props) => {
                           elementWidth && elementWidth > 641 ? "20px" : "8px",
                       }}           
                     >
-                      <MoreVertIcon />
+                     
                       <DropdownMenu />
                     </IconButton>
                   </div>
