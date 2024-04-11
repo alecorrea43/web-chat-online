@@ -19,7 +19,7 @@ const DropdownMenu = () => {
   return (
     <div>
       <IconButton onClick={handleMenuOpen}
-      color="000#"
+      color="inherit"
       >
         <MoreVertIcon />
       </IconButton>
