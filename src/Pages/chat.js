@@ -31,7 +31,7 @@ import InputBase from "@mui/material/InputBase";
 import SendIcon from "@mui/icons-material/Send";
 import MessageIcon from "@mui/icons-material/Message";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-
+import DropdownMenu from "./dropDownMenu"; 
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -145,9 +145,8 @@ const Chat = (props) => {
   const [elementWidth, setElementWidth] = useState(null);
   const [isBuscadorListaVisible, setIsBuscadorListaVisible] = useState(true);
   const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
-
   const contenedorCajasRef = useRef(null);
-
+ 
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -542,6 +541,9 @@ const Chat = (props) => {
     setIsBuscadorListaVisible(true);
     setIsContenedor3Visible(false);
   };
+
+
+
   
   return (
     <div className="caja-padre">
@@ -738,9 +740,10 @@ const Chat = (props) => {
                       sx={{
                         marginRight:
                           elementWidth && elementWidth > 641 ? "20px" : "8px",
-                      }}
+                      }}           
                     >
                       <MoreVertIcon />
+                      <DropdownMenu />
                     </IconButton>
                   </div>
                   <div className="caja-chat">
