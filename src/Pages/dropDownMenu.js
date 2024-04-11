@@ -14,6 +14,12 @@ const DropdownMenu = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
     setIsDropdownOpen(false);
+    
+  };
+
+  const handleMenuItemClick = (event) => {
+    handleMenuClose();
+ 
   };
 
   return (
@@ -28,8 +34,8 @@ const DropdownMenu = () => {
         open={isDropdownOpen}
         onClose={handleMenuClose}
       >
-        <MenuItem>Delete chat</MenuItem>
-        <MenuItem>Blockear user</MenuItem>
+           <MenuItem onClick={handleMenuItemClick}>Delete chat</MenuItem>
+        <MenuItem onClick={handleMenuItemClick}>Block user</MenuItem>
       </Menu>
     </div>
   );
