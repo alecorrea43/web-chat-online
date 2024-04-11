@@ -18,7 +18,9 @@ const DropdownMenu = () => {
 
   return (
     <div>
-      <IconButton onClick={handleMenuOpen}>
+      <IconButton onClick={handleMenuOpen}
+      color="inherit"
+      >
         <MoreVertIcon />
       </IconButton>
       <Menu

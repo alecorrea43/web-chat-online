@@ -735,7 +735,7 @@ const Chat = (props) => {
                         ?.name || "Usuario desconocido"}
                     </Typography>
                     <Box
-                      color="inherit"
+                      
                       sx={{
                         marginRight:
                           elementWidth && elementWidth > 641 ? "20px" : "8px",
