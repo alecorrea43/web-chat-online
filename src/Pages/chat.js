@@ -317,7 +317,7 @@ const Chat = (props) => {
     try {
       const token = authToken || authTokenFromLocation;
       console.log("Token de autenticación:", token);
-      const response = await fetch("http://localhost:3001/logout", {
+      const response = await fetch("https://guttural-omniscient-kilometer.glitch.me/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -351,7 +351,7 @@ const Chat = (props) => {
 
   useEffect(() => {
     if (shouldConnect) {
-      const newSocket = io("http://localhost:3001");
+      const newSocket = io("https://guttural-omniscient-kilometer.glitch.me");
       setSocket(newSocket);
 
       if (newSocket) {
