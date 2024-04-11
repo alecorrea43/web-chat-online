@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import { styled } from "@mui/system";
-import io from 'socket.io-client';
+
 
 const StyledContainer = styled(Box)({
   display: "flex",
@@ -147,9 +147,7 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(data.error || "Error en la solicitud");
       }
-      const socket = io("https://scientific-intelligent-quality.glitch.me");
-      socket.emit("userConnected", { email: data.email });
-      setError("");
+    
 
       console.log("Inicio de sesión exitoso");
 
