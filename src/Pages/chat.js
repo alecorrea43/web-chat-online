@@ -249,7 +249,7 @@ const Chat = (props) => {
         console.log("Actualizando activeConversation a:", conversationId);
         setActiveConversation(conversationId);
         const response = await fetch(
-          `http://localhost:3001/messages/${conversationId}`,
+          `/.netlify/functions/getMessages?conversationId=${conversationId}`,
           {
             method: "GET",
             headers: {
