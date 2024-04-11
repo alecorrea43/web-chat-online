@@ -734,16 +734,16 @@ const Chat = (props) => {
                       {loggedInUsers.find((user) => user.email === selectedUser)
                         ?.name || "Usuario desconocido"}
                     </Typography>
-                    <IconButton
+                    <Box
                       color="inherit"
                       sx={{
                         marginRight:
                           elementWidth && elementWidth > 641 ? "20px" : "8px",
                       }}           
                     >
-                     
+                        
                       <DropdownMenu />
-                    </IconButton>
+                    </Box>
                   </div>
                   <div className="caja-chat">
                     <ChatBox selectedUser={selectedUser}>
