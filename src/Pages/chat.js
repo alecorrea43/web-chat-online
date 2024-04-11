@@ -317,7 +317,7 @@ const Chat = (props) => {
     try {
       const token = authToken || authTokenFromLocation;
       console.log("Token de autenticación:", token);
-      const response = await fetch("http://localhost:3001/logout", {
+      const response = await fetch("/.netlify/functions/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
