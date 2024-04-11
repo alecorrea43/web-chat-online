@@ -147,7 +147,7 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(data.error || "Error en la solicitud");
       }
-      const socket = io("https://guttural-omniscient-kilometer.glitch.me");
+      const socket = io("https://scientific-intelligent-quality.glitch.me");
       socket.emit("userConnected", { email: data.email });
       setError("");
 
