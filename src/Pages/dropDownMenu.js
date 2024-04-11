@@ -26,9 +26,9 @@ const DropdownMenu = () => {
         open={isDropdownOpen}
         onClose={handleMenuClose}
       >
-        <MenuItem>Option 1</MenuItem>
-        <MenuItem>Option 2</MenuItem>
-        <MenuItem>Option 3</MenuItem>
+        <MenuItem>Delete chat</MenuItem>
+        <MenuItem>Blockear user</MenuItem>
+        <MenuItem>Delete message</MenuItem>
       </Menu>
     </div>
   );
