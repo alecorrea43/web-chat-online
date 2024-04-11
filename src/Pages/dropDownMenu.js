@@ -29,7 +29,6 @@ const DropdownMenu = () => {
         onClose={handleMenuClose}
       >
         <MenuItem>Delete chat</MenuItem>
-        <MenuItem>Delete message</MenuItem>
         <MenuItem>Blockear user</MenuItem>
       </Menu>
     </div>
