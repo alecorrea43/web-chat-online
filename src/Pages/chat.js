@@ -187,6 +187,28 @@ const Chat = (props) => {
   const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
   const contenedorCajasRef = useRef(null);
 
+  const fetchAllUsers = async () => {
+    try {
+       const response = await fetch('/.netlify/functions/getAllUsers'); // Asegúrate de reemplazar '/.netlify/functions/getAllUsers' con la ruta correcta de tu función de Netlify
+       if (!response.ok) {
+         throw new Error('Error al obtener la lista de usuarios');
+       }
+       const users = await response.json();
+       return users;
+    } catch (error) {
+       console.error('Error al obtener la lista de usuarios:', error);
+       return [];
+    }
+   };
+   useEffect(() => {
+    const updateUserList = async () => {
+       const allUsers = await fetchAllUsers();
+       setLoggedInUsers(allUsers);
+    };
+   
+    updateUserList();
+   }, []);
+
   useEffect(() => {
     const handleBackButton = (event) => {
       if (isContenedor3Visible) {
