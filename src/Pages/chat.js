@@ -31,7 +31,7 @@ import InputBase from "@mui/material/InputBase";
 import SendIcon from "@mui/icons-material/Send";
 import MessageIcon from "@mui/icons-material/Message";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import DropdownMenu from "./dropDownMenu"; 
+import DropdownMenu from "./dropDownMenu";
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -81,7 +81,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   padding: "0 30px",
   "&:hover": {
     color: "#80e8f5", // Cambia el color del ícono a gris claro al pasar el mouse
-    backgroundColor:'#88C2CE',
+    backgroundColor: "#88C2CE",
   },
   "& .MuiSvgIcon-root": {
     transition: theme.transitions.create("color", {
@@ -89,9 +89,6 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
     }),
   },
 }));
-
-
-
 
 const StyledListItem = styled(ListItem)(({ theme }) => ({
   "&:hover": {
@@ -148,7 +145,6 @@ const Chat = (props) => {
   const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
   const contenedorCajasRef = useRef(null);
 
-
   useEffect(() => {
     const handleBackButton = (event) => {
       if (isContenedor3Visible) {
@@ -158,16 +154,13 @@ const Chat = (props) => {
       }
     };
 
-    window.addEventListener('popstate', handleBackButton);
+    window.addEventListener("popstate", handleBackButton);
 
     return () => {
-      window.removeEventListener('popstate', handleBackButton);
+      window.removeEventListener("popstate", handleBackButton);
     };
- }, [isContenedor3Visible, isBuscadorListaVisible]);
+  }, [isContenedor3Visible, isBuscadorListaVisible]);
 
-
-
- 
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -563,9 +556,6 @@ const Chat = (props) => {
     setIsContenedor3Visible(false);
   };
 
-
-
-  
   return (
     <div className="caja-padre">
       <AppBar position="static" className="appbar1">
@@ -757,13 +747,11 @@ const Chat = (props) => {
                         ?.name || "Usuario desconocido"}
                     </Typography>
                     <Box
-                      
                       sx={{
                         marginRight:
                           elementWidth && elementWidth > 641 ? "20px" : "8px",
-                      }}           
+                      }}
                     >
-                        
                       <DropdownMenu />
                     </Box>
                   </div>
@@ -849,19 +837,20 @@ const Chat = (props) => {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       fullWidth
-
                       sx={{
-    borderRadius: '0px',
-    backgroundColor: '#6FAFBC',
-    padding: '10px',
-    borderBottom: 'none', // Elimina el borde inferior
-    '&:after': { // Elimina cualquier estilo after
-      display: 'none',
-    },
-    '& .MuiInputBase-input': { // Asegúrate de que el input interno también no tenga borde inferior
-      borderBottom: 'none',
-    },
- }}
+                        borderRadius: "0px",
+                        backgroundColor: "#6FAFBC",
+                        padding: "10px",
+                        borderBottom: "none", // Elimina el borde inferior
+                        "&:after": {
+                          // Elimina cualquier estilo after
+                          display: "none",
+                        },
+                        "& .MuiInputBase-input": {
+                          // Asegúrate de que el input interno también no tenga borde inferior
+                          borderBottom: "none",
+                        },
+                      }}
                       autoComplete="off"
                       onKeyPress={(e) => {
                         if (e.key === "Enter") {
