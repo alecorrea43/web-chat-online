@@ -841,10 +841,11 @@ const Chat = (props) => {
                   </div>
                   <div className="caja-input-buton">
                     <TextField
+                      id="standard-multiline-static"
                       label="Escribir mensaje"
                       multiline={true}
                       maxRows={4}
-                      variant="filled"
+                      variant="standar"
                       placeholder="Escribir mensaje ..."
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
