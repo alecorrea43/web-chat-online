@@ -69,11 +69,8 @@ const StyledInput2 = styled(Input)(({ theme }) => ({
   padding: "10px",
   borderBottom: "none", // Elimina el borde inferior
   "&:hover": {
-    borderBottom: "none", // Elimina el borde inferior en hover
-    '& textarea': {
-      borderBottom: "none !important", // Asegura que el borde inferior del textarea se elimine durante el hover
-    },
- },
+     borderBottom: "none", // Elimina el borde inferior en hover
+  },
   "&:focus": {
      borderBottom: "none", // Elimina el borde inferior en focus
   },
