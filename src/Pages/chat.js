@@ -827,7 +827,7 @@ const Chat = (props) => {
                     <StyledInput
                       id="filled-textarea"
                       label="Escribir mensaje"
-                      multiline
+                      multiline={true}
                       maxRows={4}
                       variant="filled"
                       placeholder="Escribir mensaje ..."
