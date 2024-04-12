@@ -69,7 +69,7 @@ const StyledInput2 = styled(Input)(({ theme }) => ({
   padding: "10px",
   borderBottom: "none", // Elimina el borde inferior
   "&:hover": {
-     borderBottom: "none", // Elimina el borde inferior en hover
+     borderBottom: "#6FAFBC", // Elimina el borde inferior en hover
   },
   "&:focus": {
      borderBottom: "none", // Elimina el borde inferior en focus
