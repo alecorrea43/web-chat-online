@@ -145,6 +145,38 @@ const Chat = (props) => {
   const [isBuscadorListaVisible, setIsBuscadorListaVisible] = useState(true);
   const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
   const contenedorCajasRef = useRef(null);
+
+
+  useEffect(() => {
+    const fetchUnreadMessages = async () => {
+       try {
+         const response = await fetch("/deliverUnreadMessages?userEmail=" + userEmail, {
+           method: "GET",
+           headers: {
+             "Content-Type": "application/json",
+             // Asegúrate de incluir cualquier encabezado de autenticación necesario
+           },
+         });
+   
+         if (response.ok) {
+           const data = await response.json();
+           // Actualiza el estado de mensajes no leídos con los mensajes recibidos
+           setUnreadMessages(data.messages);
+         } else {
+           console.error("Error al obtener mensajes no entregados:", response.statusText);
+         }
+       } catch (error) {
+         console.error("Error al obtener mensajes no entregados:", error);
+       }
+    };
+   
+    if (shouldConnect) {
+       fetchUnreadMessages();
+    }
+   }, [shouldConnect, userEmail]);
+
+
+
  
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entries) => {
