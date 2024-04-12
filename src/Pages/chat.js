@@ -17,6 +17,7 @@ import {
   ListItem,
   Badge,
   Link,
+  TextField,
 } from "@mui/material";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -61,37 +62,7 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
     },
   },
 }));
-const StyledInput2 = styled(InputBase)(({ theme }) => ({
-  position: "relative",
-  fontSize: 16,
-  width: "100%",
-  transition: theme.transitions.create([
-     "border-color",
-     "background-color",
-     "box-shadow",
-  ]),
-  fontFamily: [
-     "-apple-system",
-     "BlinkMacSystemFont",
-     '"Segoe UI"',
-     "Roboto",
-     '"Helvetica Neue"',
-     "Arial",
-     "sans-serif",
-     '"Apple Color Emoji"',
-     '"Segoe UI Emoji"',
-     '"Segoe UI Symbol"',
-   ].join(","),
-  "&::placeholder": {
-     color: "rgba(0, 0, 0, 0.70)", // Aplica el color rgba(0, 0, 0, 0.54) al placeholder
-     opacity: 1, // Asegura que el placeholder sea visible
-  },
-  // Asegúrate de que el input sea multilinea y tenga un máximo de 4 filas
-  multiline: true,
-  rows: 1, // Número inicial de filas
-  rowsMax: 4, // Número máximo de filas
- }));
- 
+
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
     backgroundColor: "#80e8f5", // Cambia el color de fondo a negro
@@ -869,7 +840,7 @@ const Chat = (props) => {
                     </ChatBox>
                   </div>
                   <div className="caja-input-buton">
-                    <StyledInput2
+                    <TextField
                       label="Escribir mensaje"
                       multiline={true}
                       maxRows={4}
