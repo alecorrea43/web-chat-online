@@ -63,6 +63,47 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const StyledInput2 = styled(Input)(({ theme }) => ({
+  borderRadius: "0px",
+  backgroundColor: "#6FAFBC",
+  padding: "10px",
+  borderBottom: "none", // Elimina el borde inferior
+  "&:hover": {
+     borderBottom: "none", // Elimina el borde inferior en hover
+  },
+  "&:focus": {
+     borderBottom: "none", // Elimina el borde inferior en focus
+  },
+  "&:after": {
+     // Elimina cualquier estilo after
+     display: "none",
+  },
+  "&:before": {
+     // Elimina cualquier estilo before
+     borderBottom: "none",
+  },
+  "& .MuiInputBase-input": {
+     // Asegúrate de que el input interno también no tenga borde inferior
+     borderBottom: "none",
+  },
+  '@media (hover: none)': {
+     borderBottom: "none", // Asegura que no haya borde inferior en dispositivos que no soportan hover
+     "&:hover": {
+       borderBottom: "none",
+     },
+     "&:focus": {
+       borderBottom: "none",
+     },
+     "&:before": {
+       borderBottom: "none",
+     },
+     "& .MuiInputBase-input": {
+       borderBottom: "none",
+     },
+  },
+  // Añade aquí cualquier otro estilo que desees
+ }));
+
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
     backgroundColor: "#80e8f5", // Cambia el color de fondo a negro
@@ -828,7 +869,7 @@ const Chat = (props) => {
                     </ChatBox>
                   </div>
                   <div className="caja-input-buton">
-                    <Input
+                    <StyledInput2
                       label="Escribir mensaje"
                       multiline={true}
                       maxRows={4}
@@ -837,45 +878,6 @@ const Chat = (props) => {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       fullWidth
-                      sx={{
-                        borderRadius: "0px",
-                        backgroundColor: "#6FAFBC",
-                        padding: "10px",
-                        borderBottom: "none", // Elimina el borde inferior en el estado normal
-                        "&:hover": {
-                          borderBottom: "none", // Elimina el borde inferior en hover
-                        },
-                        "&:focus": {
-                          borderBottom: "none", // Elimina el borde inferior en focus
-                        },
-                        "&:after": {
-                          // Elimina cualquier estilo after
-                          display: "none",
-                        },
-                        "&:before": {
-                          // Elimina cualquier estilo before
-                          borderBottom: "none",
-                        },
-                        "& .MuiInputBase-input": {
-                          // Asegúrate de que el input interno también no tenga borde inferior
-                          borderBottom: "none",
-                        },
-                        '@media (hover: none)': {
-                          borderBottom: "none", // Asegura que no haya borde inferior en dispositivos que no soportan hover
-                          "&:hover": {
-                            borderBottom: "none",
-                          },
-                          "&:focus": {
-                            borderBottom: "none",
-                          },
-                          "&:before": {
-                            borderBottom: "none",
-                          },
-                          "& .MuiInputBase-input": {
-                            borderBottom: "none",
-                          },
-                        },
-                      }}
                       autoComplete="off"
                       onKeyPress={(e) => {
                         if (e.key === "Enter") {
