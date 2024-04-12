@@ -17,7 +17,7 @@ import {
   ListItem,
   Badge,
   Link,
-  TextField,
+  Input,
 } from "@mui/material";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -840,12 +840,11 @@ const Chat = (props) => {
                     </ChatBox>
                   </div>
                   <div className="caja-input-buton">
-                    <TextField
-                     
+                    <Input
                       label="Escribir mensaje"
-                      multiline
+                      multiline={true}
                       maxRows={4}
-                      variant="standar"
+                      variant="filled"
                       placeholder="Escribir mensaje ..."
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
