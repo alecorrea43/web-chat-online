@@ -841,18 +841,39 @@ const Chat = (props) => {
                         borderRadius: "0px",
                         backgroundColor: "#6FAFBC",
                         padding: "10px",
-                        borderBottom: "none", // Elimina el borde inferior
+                        borderBottom: "none", // Elimina el borde inferior en el estado normal
+                        "&:hover": {
+                          borderBottom: "none", // Elimina el borde inferior en hover
+                        },
+                        "&:focus": {
+                          borderBottom: "none", // Elimina el borde inferior en focus
+                        },
                         "&:after": {
                           // Elimina cualquier estilo after
                           display: "none",
                         },
                         "&:before": {
-                          // Elimina cualquier estilo hover
+                          // Elimina cualquier estilo before
                           borderBottom: "none",
                         },
                         "& .MuiInputBase-input": {
                           // Asegúrate de que el input interno también no tenga borde inferior
                           borderBottom: "none",
+                        },
+                        '@media (hover: none)': {
+                          borderBottom: "none", // Asegura que no haya borde inferior en dispositivos que no soportan hover
+                          "&:hover": {
+                            borderBottom: "none",
+                          },
+                          "&:focus": {
+                            borderBottom: "none",
+                          },
+                          "&:before": {
+                            borderBottom: "none",
+                          },
+                          "& .MuiInputBase-input": {
+                            borderBottom: "none",
+                          },
                         },
                       }}
                       autoComplete="off"
