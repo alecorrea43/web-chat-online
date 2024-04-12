@@ -841,7 +841,7 @@ const Chat = (props) => {
                   </div>
                   <div className="caja-input-buton">
                     <TextField
-                       id="standard-multiline-flexible"
+                     
                       label="Escribir mensaje"
                       multiline
                       maxRows={4}
