@@ -848,7 +848,7 @@ const Chat = (props) => {
                         },
                         "&:hover": {
                           // Elimina cualquier estilo hover
-                        borderBottom: "none",
+                        borderBottom: "1px solid transparent",
                         },
                         "&:before": {
                           // Elimina cualquier estilo hover
