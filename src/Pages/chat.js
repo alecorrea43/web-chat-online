@@ -848,7 +848,7 @@ const Chat = (props) => {
                         },
                         "&:hover": {
                           // Elimina cualquier estilo hover
-                          borderBottom: "none",
+                          display: "none",
                         },
                         "& .MuiInputBase-input": {
                           // Asegúrate de que el input interno también no tenga borde inferior
