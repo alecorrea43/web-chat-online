@@ -187,6 +187,30 @@ const Chat = (props) => {
   const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
   const contenedorCajasRef = useRef(null);
 
+
+  useEffect(() => {
+    const handleResize = () => {
+       // Ajusta la lógica de visibilidad basada en el tamaño de la ventana
+       if (window.innerHeight < window.innerWidth) {
+         // El teclado está probablemente abierto
+         setIsBuscadorListaVisible(false);
+         setIsContenedor3Visible(true);
+       } else {
+         // El teclado está probablemente cerrado
+         setIsBuscadorListaVisible(true);
+         setIsContenedor3Visible(false);
+       }
+    };
+   
+    window.addEventListener('resize', handleResize);
+   
+    // Limpieza al desmontar el componente
+    return () => {
+       window.removeEventListener('resize', handleResize);
+    };
+   }, []);
+
+
   useEffect(() => {
     const handleBackButton = (event) => {
       if (isContenedor3Visible) {
