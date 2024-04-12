@@ -847,7 +847,7 @@ const Chat = (props) => {
                           display: "none",
                         },
                         "&:hover": {
-                          // Elimina cualquier estilo after
+                          // Elimina cualquier estilo hover
                           borderBottom: "none",
                         },
                         "& .MuiInputBase-input": {
