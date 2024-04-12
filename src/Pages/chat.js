@@ -147,34 +147,7 @@ const Chat = (props) => {
   const contenedorCajasRef = useRef(null);
 
 
-  useEffect(() => {
-    const fetchUnreadMessages = async () => {
-       try {
-         const response = await fetch("/.netlify/functions/deliverUnreadMessages" + userEmail, {
-           method: "GET",
-           headers: {
-             "Content-Type": "application/json",
-             // Asegúrate de incluir cualquier encabezado de autenticación necesario
-           },
-         });
-   
-         if (response.ok) {
-           const data = await response.json();
-           // Actualiza el estado de mensajes no leídos con los mensajes recibidos
-           setUnreadMessages(data.messages);
-         } else {
-           console.error("Error al obtener mensajes no entregados:", response.statusText);
-         }
-       } catch (error) {
-         console.error("Error al obtener mensajes no entregados:", error);
-       }
-    };
-   
-    if (shouldConnect) {
-       fetchUnreadMessages();
-    }
-   }, [shouldConnect, userEmail]);
-
+  
 
 
  
