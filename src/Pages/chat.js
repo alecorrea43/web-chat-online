@@ -101,9 +101,7 @@ const StyledInput2 = styled(Input)(({ theme }) => ({
        borderBottom: "none",
      },
   },
-  '& textarea': {
-    borderBottom: "none !important", // Asegura que el borde inferior del textarea se elimine
- },
+  
   // Añade aquí cualquier otro estilo que desees
  }));
 
