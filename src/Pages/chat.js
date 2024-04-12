@@ -841,7 +841,7 @@ const Chat = (props) => {
                         borderRadius: "0px",
                         backgroundColor: "#6FAFBC",
                         padding: "10px",
-                        borderBottom: "1px solid #000", // Elimina el borde inferior
+                        borderBottom: "none", // Elimina el borde inferior
                         "&:after": {
                           // Elimina cualquier estilo after
                           display: "none",
