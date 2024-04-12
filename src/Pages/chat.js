@@ -840,7 +840,6 @@ const Chat = (props) => {
                   <div className="caja-input-buton">
                    
                     <StyledInput
-                      
                       label="Escribir mensaje"
                       multiline={true}
                       maxRows={4}
