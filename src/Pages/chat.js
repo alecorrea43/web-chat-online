@@ -841,19 +841,12 @@ const Chat = (props) => {
                         borderRadius: "0px",
                         backgroundColor: "#6FAFBC",
                         padding: "10px",
-                        borderBottom: "none", // Elimina el borde inferior
+                        borderBottom: "1px solid #000", // Elimina el borde inferior
                         "&:after": {
                           // Elimina cualquier estilo after
                           display: "none",
                         },
-                        "&:bofore": {
-                          // Elimina cualquier estilo after
-                          display: "none",
-                        },
-                        "&:hover": {
-                          // Elimina cualquier estilo after
-                          display: "none",
-                        },
+                        
                         "& .MuiInputBase-input": {
                           // Asegúrate de que el input interno también no tenga borde inferior
                           borderBottom: "none",
