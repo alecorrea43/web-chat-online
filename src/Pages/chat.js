@@ -849,7 +849,19 @@ const Chat = (props) => {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       fullWidth
-                      sx={{borderRadius:'0px', backgroundColor:'#6FAFBC',padding:'10px'}}
+
+                      sx={{
+    borderRadius: '0px',
+    backgroundColor: '#6FAFBC',
+    padding: '10px',
+    borderBottom: 'none', // Elimina el borde inferior
+    '&:after': { // Elimina cualquier estilo after
+      display: 'none',
+    },
+    '& .MuiInputBase-input': { // Asegúrate de que el input interno también no tenga borde inferior
+      borderBottom: 'none',
+    },
+ }}
                       autoComplete="off"
                       onKeyPress={(e) => {
                         if (e.key === "Enter") {
