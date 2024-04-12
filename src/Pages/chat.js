@@ -147,7 +147,22 @@ const Chat = (props) => {
   const contenedorCajasRef = useRef(null);
 
 
-  
+  useEffect(() => {
+    const handleBackButton = (event) => {
+      if (isContenedor3Visible) {
+        event.preventDefault();
+        setIsContenedor3Visible(false); // Oculta la caja de chat
+        setIsBuscadorListaVisible(true); // Muestra la caja de lista
+      }
+    };
+
+    window.addEventListener('popstate', handleBackButton);
+
+    return () => {
+      window.removeEventListener('popstate', handleBackButton);
+    };
+ }, [isContenedor3Visible, isBuscadorListaVisible]);
+
 
 
  
