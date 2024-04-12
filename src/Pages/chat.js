@@ -150,7 +150,7 @@ const Chat = (props) => {
   useEffect(() => {
     const fetchUnreadMessages = async () => {
        try {
-         const response = await fetch("/deliverUnreadMessages?userEmail=" + userEmail, {
+         const response = await fetch("/.netlify/functions/deliverUnreadMessages" + userEmail, {
            method: "GET",
            headers: {
              "Content-Type": "application/json",
