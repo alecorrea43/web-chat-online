@@ -292,7 +292,6 @@ const Chat = (props) => {
     if (selectedUserEmail && selectedUserEmail !== "null") {
       setSelectedUser(selectedUserEmail);
       setRecipient(selectedUserEmail);
-      navigate(`/chat/${selectedUserEmail}`);
       try {
         const token = authToken || authTokenFromLocation;
         console.log("Token:", token); // Depuración: Verifica el token de autenticación
