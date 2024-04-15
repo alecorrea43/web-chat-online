@@ -331,6 +331,7 @@ const Chat = (props) => {
       } catch (error) {
         console.error("Error al cargar los mensajes:", error);
       }
+      navigate(`/chat/${selectedUserEmail}`);
     } else {
       console.error(
         "El correo electrónico del usuario seleccionado es inválido"
