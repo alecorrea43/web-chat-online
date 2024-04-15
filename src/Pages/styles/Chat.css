@@ -63,6 +63,22 @@ height: 56px;
   max-height: 100%;
 }
 
+.caja-contenedor-3.mostrar {
+  display: block; /* Muestra el contenedor de la conversación cuando hay un usuario seleccionado */
+ }
+
+@media (min-width: 641px) {
+  .caja-buscador-lista {
+     display: block; /* Muestra el contenedor de la lista */
+  }
+ 
+  .caja-contenedor-3 {
+     display: none; /* Oculta el contenedor de la conversación */
+  }
+ }
+
+
+
 .caja-chat {
 flex: 3;
 overflow-y: auto;

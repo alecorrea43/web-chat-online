@@ -719,7 +719,7 @@ const Chat = (props) => {
   
 
       
-          <div className="caja-contenedor-3" style={{ width: elementWidth }}>
+          <div className={`caja-contenedor-3 ${selectedUser ? 'mostrar' : ''}`} style={{ width: elementWidth }}>
             <>
               {selectedUser ? (
                 <>
