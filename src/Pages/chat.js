@@ -889,12 +889,12 @@ const Chat = (props) => {
  onFocus={() => {
     // Cuando el input gana el enfoque, oculta la lista de usuarios y muestra el contenedor de chat
     setIsBuscadorListaVisible(false);
-    setIsContenedor3Visible(true);
+  
  }}
  onBlur={() => {
     // Cuando el input pierde el enfoque, muestra la lista de usuarios y oculta el contenedor de chat
     setIsBuscadorListaVisible(true);
-    setIsContenedor3Visible(false);
+  
  }}
 />
                     <StyledIconButton onClick={sendMessage}>
