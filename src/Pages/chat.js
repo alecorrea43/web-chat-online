@@ -186,6 +186,8 @@ const Chat = (props) => {
   const [isBuscadorListaVisible, setIsBuscadorListaVisible] = useState(true);
   const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
   const contenedorCajasRef = useRef(null);
+  const isChatOpen = location.pathname.includes('/chat/');
+
 
   useEffect(() => {
     const handleBackButton = (event) => {
@@ -760,7 +762,7 @@ const Chat = (props) => {
           </div>
         )}
 
-        {isContenedor3Visible && (
+        {isChatOpen && (
           <div className="caja-contenedor-3" style={{ width: elementWidth }}>
             <>
               {selectedUser ? (
