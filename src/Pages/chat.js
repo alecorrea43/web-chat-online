@@ -187,6 +187,30 @@ const Chat = (props) => {
   const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
   const contenedorCajasRef = useRef(null);
 
+
+
+  useEffect(() => {
+    const handleResize = () => {
+       // Calcula la diferencia en altura entre el tamaño de la ventana antes y después del cambio
+       const heightDifference = window.innerHeight - document.documentElement.clientHeight;
+   
+       // Si la diferencia en altura es significativa, asume que el teclado está abierto
+       if (heightDifference > 100) {
+         // Ajusta el estilo del contenedor principal para acomodar el teclado
+         document.body.style.paddingBottom = `${heightDifference}px`;
+       } else {
+         // Si no hay suficiente diferencia en altura, asume que el teclado está cerrado
+         document.body.style.paddingBottom = '0';
+       }
+    };
+   
+    window.addEventListener('resize', handleResize);
+   
+    return () => {
+       window.removeEventListener('resize', handleResize);
+    };
+   }, []);
+
   useEffect(() => {
     const handleBackButton = (event) => {
       if (isContenedor3Visible) {
