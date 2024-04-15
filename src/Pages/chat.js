@@ -709,8 +709,8 @@ const Chat = (props) => {
                         }}
                       >
                         <span>
-                        {loggedInUsers.find((user) => user.email === selectedUser)
-                        ?.name || "Usuario desconocido"}
+                          {socketIdToUserMap[user.socketId] ||
+                            "Usuario desconocido"}
                         </span>
                         {unreadMessages[conversationId] > 0 && (
                           <div
