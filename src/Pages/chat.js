@@ -186,8 +186,6 @@ const Chat = (props) => {
   const [isBuscadorListaVisible, setIsBuscadorListaVisible] = useState(true);
   const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
   const contenedorCajasRef = useRef(null);
-  const isChatOpen = location.pathname.includes('/chat/');
-
 
   useEffect(() => {
     const handleBackButton = (event) => {
@@ -333,7 +331,7 @@ const Chat = (props) => {
       } catch (error) {
         console.error("Error al cargar los mensajes:", error);
       }
-      navigate(`/chat/${selectedUserEmail}`);
+      
     } else {
       console.error(
         "El correo electrónico del usuario seleccionado es inválido"
@@ -595,7 +593,11 @@ const Chat = (props) => {
     }
   };
 
- 
+  const handleBackToUserList = () => {
+    setSelectedUser(null);
+    setIsBuscadorListaVisible(true);
+    setIsContenedor3Visible(false);
+  };
 
   return (
     <div className="caja-padre">
@@ -617,7 +619,7 @@ const Chat = (props) => {
       </AppBar>
 
       <div className="contenedor-cajas" ref={contenedorCajasRef}>
-       
+        {isBuscadorListaVisible && (
           <div className="caja-buscador-lista">
             <div className="caja-superior">
               <Box
@@ -756,9 +758,9 @@ const Chat = (props) => {
               </ListItem>
             )}
           </div>
-    
+        )}
 
-        {isChatOpen && (
+        {isContenedor3Visible && (
           <div className="caja-contenedor-3" style={{ width: elementWidth }}>
             <>
               {selectedUser ? (
@@ -767,10 +769,7 @@ const Chat = (props) => {
                     {elementWidth && elementWidth <= 641 && (
                       <IconButton
                         color="inherit"
-                        onClick={() => {
-                          // Navega al '/chat' cuando se hace clic en el botón de retroceso
-                          navigate('/chat');
-                       }}
+                        onClick={handleBackToUserList}
                         sx={{
                           marginLeft:
                             elementWidth && elementWidth > 641 ? "20px" : "8px",
