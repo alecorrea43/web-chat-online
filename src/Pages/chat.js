@@ -771,7 +771,10 @@ const Chat = (props) => {
                     {elementWidth && elementWidth <= 641 && (
                       <IconButton
                         color="inherit"
-                        onClick={handleBackToUserList}
+                        onClick={() => {
+                          // Navega al '/chat' cuando se hace clic en el botón de retroceso
+                          navigate('/chat');
+                       }}
                         sx={{
                           marginLeft:
                             elementWidth && elementWidth > 641 ? "20px" : "8px",
