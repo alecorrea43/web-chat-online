@@ -183,74 +183,12 @@ const Chat = (props) => {
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [elementWidth, setElementWidth] = useState(null);
-  const [isBuscadorListaVisible, setIsBuscadorListaVisible] = useState(true);
-  const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
+ 
   const contenedorCajasRef = useRef(null);
 
 
 
-  useEffect(() => {
-    const handleResize = () => {
-       // Calcula la diferencia en altura entre el tamaño de la ventana antes y después del cambio
-       const heightDifference = window.innerHeight - document.documentElement.clientHeight;
-   
-       // Si la diferencia en altura es significativa, asume que el teclado está abierto
-       if (heightDifference > 100) {
-         // Ajusta el estilo del contenedor principal para acomodar el teclado
-         document.body.style.paddingBottom = `${heightDifference}px`;
-       } else {
-         // Si no hay suficiente diferencia en altura, asume que el teclado está cerrado
-         document.body.style.paddingBottom = '0';
-       }
-    };
-   
-    window.addEventListener('resize', handleResize);
-   
-    return () => {
-       window.removeEventListener('resize', handleResize);
-    };
-   }, []);
-
-  useEffect(() => {
-    const handleBackButton = (event) => {
-      if (isContenedor3Visible) {
-        event.preventDefault();
-        setIsContenedor3Visible(false); // Oculta la caja de chat
-        setIsBuscadorListaVisible(true); // Muestra la caja de lista
-      }
-    };
-
-    window.addEventListener("popstate", handleBackButton);
-
-    return () => {
-      window.removeEventListener("popstate", handleBackButton);
-    };
-  }, [isContenedor3Visible, isBuscadorListaVisible]);
-
-  useEffect(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const width = entry.contentRect.width;
-        if (width >= 641) {
-          // Si el ancho es mayor o igual a 641px, ambos contenedores deben ser visibles
-          setIsBuscadorListaVisible(true);
-          setIsContenedor3Visible(true);
-        } else {
-          // Si el ancho es menor a 641px, solo caja-buscador-lista debe ser visible
-          setIsBuscadorListaVisible(true);
-          setIsContenedor3Visible(false);
-        }
-      }
-    });
-
-    if (contenedorCajasRef.current) {
-      resizeObserver.observe(contenedorCajasRef.current);
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
+ 
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entries) => {
@@ -364,10 +302,7 @@ const Chat = (props) => {
     await new Promise((resolve) => setTimeout(resolve, 100)); // Simula un retraso
     setLoading(false);
 
-    if (window.innerWidth < 641) {
-      setIsBuscadorListaVisible(false);
-      setIsContenedor3Visible(true);
-    }
+
   };
 
   const lastMessageRef = useRef(null);
@@ -618,8 +553,7 @@ const Chat = (props) => {
 
   const handleBackToUserList = () => {
     setSelectedUser(null);
-    setIsBuscadorListaVisible(true);
-    setIsContenedor3Visible(false);
+ 
   };
 
   return (
@@ -642,7 +576,7 @@ const Chat = (props) => {
       </AppBar>
 
       <div className="contenedor-cajas" ref={contenedorCajasRef}>
-        {isBuscadorListaVisible && (
+      
           <div className="caja-buscador-lista">
             <div className="caja-superior">
               <Box
@@ -781,9 +715,9 @@ const Chat = (props) => {
               </ListItem>
             )}
           </div>
-        )}
+  
 
-        {isContenedor3Visible && (
+      
           <div className="caja-contenedor-3" style={{ width: elementWidth }}>
             <>
               {selectedUser ? (
@@ -929,7 +863,7 @@ const Chat = (props) => {
               )}
             </>
           </div>
-        )}
+   
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>Confirmar Cierre de Sesión</DialogTitle>
           <DialogContent>
