@@ -209,7 +209,7 @@ const Chat = (props) => {
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const width = entry.contentRect.width;
-        if (width >= 641) {
+        if (width >= 740) {
           // Si el ancho es mayor o igual a 641px, ambos contenedores deben ser visibles
           setIsBuscadorListaVisible(true);
           setIsContenedor3Visible(true);
@@ -768,13 +768,13 @@ const Chat = (props) => {
               {selectedUser ? (
                 <>
                   <div className="usuario-seleccionado">
-                    {elementWidth && elementWidth <= 641 && (
+                    {elementWidth && elementWidth <= 740 && (
                       <IconButton
                         color="inherit"
                         onClick={handleBackToUserList}
                         sx={{
                           marginLeft:
-                            elementWidth && elementWidth > 641 ? "20px" : "8px",
+                            elementWidth && elementWidth >740 ? "20px" : "8px",
                         }}
                       >
                         <ArrowBackIosIcon />
@@ -785,7 +785,7 @@ const Chat = (props) => {
                       component="div"
                       sx={{
                         marginLeft:
-                          elementWidth && elementWidth > 641 ? "24px" : "0px",
+                          elementWidth && elementWidth > 740 ? "24px" : "0px",
                       }}
                     >
                       {loggedInUsers.find((user) => user.email === selectedUser)
@@ -794,7 +794,7 @@ const Chat = (props) => {
                     <Box
                       sx={{
                         marginRight:
-                          elementWidth && elementWidth > 641 ? "20px" : "8px",
+                          elementWidth && elementWidth > 740 ? "20px" : "8px",
                       }}
                     >
                       <DropdownMenu />
