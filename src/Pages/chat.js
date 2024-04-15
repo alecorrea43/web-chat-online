@@ -18,6 +18,7 @@ import {
   Badge,
   Link,
   Input,
+  useMediaQuery
 } from "@mui/material";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -183,7 +184,7 @@ const Chat = (props) => {
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [elementWidth, setElementWidth] = useState(null);
- 
+  const isSmallScreen = useMediaQuery('(max-width:640px)');
   const contenedorCajasRef = useRef(null);
 
 
@@ -576,7 +577,7 @@ const Chat = (props) => {
       </AppBar>
 
       <div className="contenedor-cajas" ref={contenedorCajasRef}>
-      
+      {!selectedUser && isSmallScreen && (
           <div className="caja-buscador-lista">
             <div className="caja-superior">
               <Box
@@ -715,9 +716,9 @@ const Chat = (props) => {
               </ListItem>
             )}
           </div>
-  
+  )}
 
-      
+{(selectedUser || !isSmallScreen) && (
           <div className="caja-contenedor-3" style={{ width: elementWidth }}>
             <>
               {selectedUser ? (
@@ -863,7 +864,7 @@ const Chat = (props) => {
               )}
             </>
           </div>
-   
+   )}
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>Confirmar Cierre de Sesión</DialogTitle>
           <DialogContent>
