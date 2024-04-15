@@ -577,7 +577,7 @@ const Chat = (props) => {
       </AppBar>
 
       <div className="contenedor-cajas" ref={contenedorCajasRef}>
-      {!selectedUser && isSmallScreen && (
+      {isSmallScreen && (
           <div className="caja-buscador-lista">
             <div className="caja-superior">
               <Box
@@ -716,9 +716,9 @@ const Chat = (props) => {
               </ListItem>
             )}
           </div>
-  )}
-
-{(selectedUser || !isSmallScreen) && (
+  
+)}
+      {(!isSmallScreen || selectedUser) && (
           <div className="caja-contenedor-3" style={{ width: elementWidth }}>
             <>
               {selectedUser ? (
@@ -864,7 +864,7 @@ const Chat = (props) => {
               )}
             </>
           </div>
-   )}
+      )}
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>Confirmar Cierre de Sesión</DialogTitle>
           <DialogContent>
