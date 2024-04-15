@@ -870,23 +870,33 @@ const Chat = (props) => {
                     </ChatBox>
                   </div>
                   <div className="caja-input-buton">
-                    <StyledInput2
-                      label="Escribir mensaje"
-                      multiline={true}
-                      maxRows={4}
-                      variant="filled"
-                      placeholder="Escribir mensaje ..."
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      fullWidth
-                      autoComplete="off"
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault(); // Previene la acción predeterminada de Enter
-                          sendMessage(); // Llama a la función sendMessage
-                        }
-                      }}
-                    />
+                  <StyledInput2
+ label="Escribir mensaje"
+ multiline={true}
+ maxRows={4}
+ variant="filled"
+ placeholder="Escribir mensaje ..."
+ value={message}
+ onChange={(e) => setMessage(e.target.value)}
+ fullWidth
+ autoComplete="off"
+ onKeyPress={(e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Previene la acción predeterminada de Enter
+      sendMessage(); // Llama a la función sendMessage
+    }
+ }}
+ onFocus={() => {
+    // Cuando el input gana el enfoque, oculta la lista de usuarios y muestra el contenedor de chat
+    setIsBuscadorListaVisible(false);
+    setIsContenedor3Visible(true);
+ }}
+ onBlur={() => {
+    // Cuando el input pierde el enfoque, muestra la lista de usuarios y oculta el contenedor de chat
+    setIsBuscadorListaVisible(true);
+    setIsContenedor3Visible(false);
+ }}
+/>
                     <StyledIconButton onClick={sendMessage}>
                       <SendIcon />
                     </StyledIconButton>
