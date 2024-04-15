@@ -595,11 +595,7 @@ const Chat = (props) => {
     }
   };
 
-  const handleBackToUserList = () => {
-    setSelectedUser(null);
-    setIsBuscadorListaVisible(true);
-    setIsContenedor3Visible(false);
-  };
+ 
 
   return (
     <div className="caja-padre">
