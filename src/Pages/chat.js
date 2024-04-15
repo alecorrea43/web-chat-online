@@ -186,6 +186,26 @@ const Chat = (props) => {
   const [isBuscadorListaVisible, setIsBuscadorListaVisible] = useState(true);
   const [isContenedor3Visible, setIsContenedor3Visible] = useState(false);
   const contenedorCajasRef = useRef(null);
+  const [userNames, setUserNames] = useState([]);
+
+  useEffect(() => {
+    const fetchUserNames = async () => {
+      try {
+        const response = await fetch('/.netlify/functions/getAllUserNames');
+        if (response.ok) {
+          const data = await response.json();
+          setUserNames(data.userNames);
+        } else {
+          console.error('Error al obtener los nombres de usuario:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error al obtener los nombres de usuario:', error);
+      }
+    };
+
+    fetchUserNames();
+ }, []);
+
 
 
 
@@ -711,8 +731,7 @@ const Chat = (props) => {
                         }}
                       >
                         <span>
-                          {socketIdToUserMap[user.socketId] ||
-                            "Usuario desconocido"}
+                        {userNames.find(name => name.socketId === user.socketId) || "Usuario desconocido"}
                         </span>
                         {unreadMessages[conversationId] > 0 && (
                           <div
