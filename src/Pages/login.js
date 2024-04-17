@@ -131,7 +131,7 @@ const Login = () => {
     try {
       setIdentifierError("");
 
-      const response = await fetch("https://web-chatonline.netlify.app/.netlify/functions/login", {
+      const response = await fetch("/.netlify/functions/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
