@@ -1,9 +1,10 @@
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
+require('dotenv').config();
 
 exports.handler = async (event, context) => {
-    const uri = process.env.MONGODB_URI; // Asegúrate de tener esta variable de entorno configurada
+    const uri = process.env.MONGODB_URI;
     const client = new MongoClient(uri);
 
     try {
@@ -11,7 +12,6 @@ exports.handler = async (event, context) => {
         const collection = client.db("test").collection("users");
         let userData = JSON.parse(event.body);
 
-        // Verificar si el nombre de usuario o el correo electrónico ya existen
         const existingUser = await collection.findOne({
             $or: [
                 { name: userData.name },
@@ -20,7 +20,6 @@ exports.handler = async (event, context) => {
         });
 
         if (existingUser) {
-            // Si el usuario ya existe, devolver un mensaje de error
             return {
                 statusCode: 200,
                 body: JSON.stringify({
@@ -31,37 +30,36 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Cifrar la contraseña antes de guardarla
-        const saltRounds = 10; // Número de rondas para el cifrado
+        const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
-        userData.password = hashedPassword; // Reemplazar la contraseña en texto plano con la cifrada
-
-        // Agregar el campo 'connected' con valor predeterminado de false
+        userData.password = hashedPassword;
         userData.connected = false;
 
         const result = await collection.insertOne(userData);
         console.log(`Usuario insertado con el _id: ${result.insertedId}`);
 
+        const oAuth2Client = new google.auth.OAuth2(
+            process.env.GMAIL_CLIENT_ID,
+            process.env.GMAIL_CLIENT_SECRET,
+            process.env.GMAIL_REDIRECT_URI
+        );
+        oAuth2Client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
 
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.GMAIL_USERNAME, // Utiliza la variable de entorno
-                pass: process.env.GMAIL_PASSWORD // Utiliza la variable de entorno
-            }
+        const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+
+        const rawMessage = makeBody(
+            userData.email,
+            process.env.GMAIL_USERNAME,
+            'Bienvenido a nuestra página web',
+            `Hola ${userData.name}, gracias por registrarte en nuestra página web. ¡Esperamos que disfrutes de nuestros servicios!`
+        );
+
+        await gmail.users.messages.send({
+            userId: 'me',
+            requestBody: {
+                raw: rawMessage,
+            },
         });
-
-        // Opciones del correo
-        const mailOptions = {
-            from: process.env.GMAIL_USERNAME,
-            to: userData.email,
-            subject: 'Bienvenido a nuestra página web',
-            text: `Hola ${userData.name}, gracias por registrarte en nuestra página web. ¡Esperamos que disfrutes de nuestros servicios!`,
-           
-        };
-
-        // Enviar el correo
-        await transporter.sendMail(mailOptions);
 
     } catch (e) {
         console.error(e);
@@ -78,3 +76,16 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({ message: "Usuario registrado exitosamente" }),
     };
 };
+
+// Función para codificar el mensaje en base64
+function makeBody(to, from, subject, message) {
+    const str = [
+        `To: ${to}`,
+        `From: ${from}`,
+        `Subject: ${subject}`,
+        '',
+        message,
+    ].join('\n');
+
+    return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_');
+}
