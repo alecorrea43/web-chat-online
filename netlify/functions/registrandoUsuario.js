@@ -3,6 +3,34 @@ const bcrypt = require('bcrypt');
 const { google } = require('googleapis');
 require('dotenv').config();
 
+// Configuración inicial del cliente OAuth2
+const oAuth2Client = new google.auth.OAuth2(
+    process.env.GMAIL_CLIENT_ID,
+    process.env.GMAIL_CLIENT_SECRET,
+    process.env.GMAIL_REDIRECT_URI
+);
+
+// Función para generar la URL de autorización
+exports.getAuthUrl = async function(event, context) {
+    try {
+        const authUrl = oAuth2Client.generateAuthUrl({
+            access_type: 'offline',
+            scope: ['https://www.googleapis.com/auth/gmail.send']
+        });
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ authUrl })
+        };
+    } catch (error) {
+        console.error('Error al generar la URL de autenticación', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error al generar la URL de autenticación' })
+        };
+    }
+};
+
+// Función principal para manejar el registro de usuarios
 exports.handler = async (event, context) => {
     const uri = process.env.MONGODB_URI;
     const client = new MongoClient(uri);
@@ -38,11 +66,6 @@ exports.handler = async (event, context) => {
         const result = await collection.insertOne(userData);
         console.log(`Usuario insertado con el _id: ${result.insertedId}`);
 
-        const oAuth2Client = new google.auth.OAuth2(
-            process.env.GMAIL_CLIENT_ID,
-            process.env.GMAIL_CLIENT_SECRET,
-            process.env.GMAIL_REDIRECT_URI
-        );
         oAuth2Client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
 
         const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
