@@ -37,6 +37,8 @@ exports.handler = async (event, context) => {
 
     try {
         await client.connect();
+        console.log('Conectado a la base de datos MongoDB');
+        
         const collection = client.db("test").collection("users");
         let userData = JSON.parse(event.body);
 
@@ -66,9 +68,15 @@ exports.handler = async (event, context) => {
         const result = await collection.insertOne(userData);
         console.log(`Usuario insertado con el _id: ${result.insertedId}`);
 
+        console.log('Configurando el cliente OAuth2 con el token de refresco');
         oAuth2Client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
 
         const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+
+        console.log('Enviando correo con los siguientes detalles:');
+        console.log(`Para: ${userData.email}`);
+        console.log(`Asunto: Bienvenido a nuestra página web`);
+        console.log(`Mensaje: Hola ${userData.name}, gracias por registrarte en nuestra página web. ¡Esperamos que disfrutes de nuestros servicios!`);
 
         const rawMessage = makeBody(
             userData.email,
@@ -77,15 +85,18 @@ exports.handler = async (event, context) => {
             `Hola ${userData.name}, gracias por registrarte en nuestra página web. ¡Esperamos que disfrutes de nuestros servicios!`
         );
 
-        await gmail.users.messages.send({
+        console.log('Mensaje codificado:', rawMessage);
+
+        const response = await gmail.users.messages.send({
             userId: 'me',
             requestBody: {
                 raw: rawMessage,
             },
         });
+        console.log('Respuesta del envío de correo:', response.data);
 
     } catch (e) {
-        console.error(e);
+        console.error('Error durante el proceso:', e);
         return {
             statusCode: 500,
             body: JSON.stringify({ message: "Error al insertar el usuario o enviar el correo" }),
