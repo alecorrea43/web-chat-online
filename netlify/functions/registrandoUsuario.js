@@ -65,7 +65,7 @@ exports.handler = async (event, context) => {
         console.error(e);
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: "Error al insertar el usuario" }),
+            body: JSON.stringify({ message: "Error al insertar el usuario o enviar el correo" }),
         };
     } finally {
         await client.close();
