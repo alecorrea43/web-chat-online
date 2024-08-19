@@ -10,26 +10,6 @@ const oAuth2Client = new google.auth.OAuth2(
     process.env.GMAIL_REDIRECT_URI
 );
 
-// Función para generar la URL de autorización
-exports.getAuthUrl = async function(event, context) {
-    try {
-        const authUrl = oAuth2Client.generateAuthUrl({
-            access_type: 'offline',
-            scope: ['https://www.googleapis.com/auth/gmail.send']
-        });
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ authUrl })
-        };
-    } catch (error) {
-        console.error('Error al generar la URL de autenticación', error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Error al generar la URL de autenticación' })
-        };
-    }
-};
-
 exports.handler = async (event, context) => {
     // Asegúrate de que el evento es una solicitud POST
     if (event.httpMethod !== "POST") {
