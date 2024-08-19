@@ -1,6 +1,14 @@
 const { MongoClient } = require('mongodb');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
+require('dotenv').config();
+
+// Configuración inicial del cliente OAuth2
+const oAuth2Client = new google.auth.OAuth2(
+    process.env.GMAIL_CLIENT_ID,
+    process.env.GMAIL_CLIENT_SECRET,
+    process.env.GMAIL_REDIRECT_URI
+);
 
 exports.handler = async (event, context) => {
     // Asegúrate de que el evento es una solicitud POST
@@ -41,30 +49,29 @@ exports.handler = async (event, context) => {
 
         // Enviar el correo electrónico con el enlace de recuperación
         const resetPasswordLink = `https://web-chatonline.netlify.app/reset-password/${token}`;
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            port: 587,
-            auth: {
-                user: process.env.GMAIL_USERNAME,
-                pass: process.env.GMAIL_PASSWORD,
+
+        // Configurar las credenciales del cliente OAuth2
+        oAuth2Client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
+
+        // Crear el cuerpo del mensaje en formato raw
+        const rawMessage = makeBody(
+            email,
+            process.env.GMAIL_USERNAME,
+            'Recuperación de Contraseña',
+            `Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: ${resetPasswordLink}`
+        );
+
+        // Enviar el correo utilizando la API de Gmail
+        const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+
+        await gmail.users.messages.send({
+            userId: 'me',
+            requestBody: {
+                raw: rawMessage,
             },
         });
 
-        const msg = {
-            to: email,
-            from: process.env.GMAIL_USERNAME,
-            subject: "Recuperación de Contraseña",
-            text: `Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: ${resetPasswordLink}`,
-            html: `<p>Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: <a href="${resetPasswordLink}">Restablecer Contraseña</a></p>`,
-        };
-
-        try {
-            await transporter.sendMail(msg);
-            console.log("Correo electrónico de recuperación enviado exitosamente.");
-        } catch (error) {
-            console.error("Error al enviar el correo electrónico de recuperación:", error);
-            throw new Error("Error al enviar el correo electrónico de recuperación.");
-        }
+        console.log("Correo electrónico de recuperación enviado exitosamente.");
 
         return {
             statusCode: 200,
@@ -80,3 +87,16 @@ exports.handler = async (event, context) => {
         await client.close();
     }
 };
+
+// Función para codificar el mensaje en base64
+function makeBody(to, from, subject, message) {
+    const str = [
+        `To: ${to}`,
+        `From: ${from}`,
+        `Subject: ${subject}`,
+        '',
+        message,
+    ].join('\n');
+
+    return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_');
+}
