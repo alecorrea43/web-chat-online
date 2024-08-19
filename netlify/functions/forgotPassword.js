@@ -3,12 +3,13 @@ const crypto = require('crypto');
 const { google } = require('googleapis');
 require('dotenv').config();
 
-// Configuración inicial del cliente OAuth2
 const oAuth2Client = new google.auth.OAuth2(
     process.env.GMAIL_CLIENT_ID,
     process.env.GMAIL_CLIENT_SECRET,
     process.env.GMAIL_REDIRECT_URI
 );
+
+oAuth2Client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
 
 exports.handler = async (event, context) => {
     // Asegúrate de que el evento es una solicitud POST
@@ -34,7 +35,18 @@ exports.handler = async (event, context) => {
 
     try {
         await client.connect();
-        const recoveryTokensCollection = client.db("test").collection("recoveryTokens");
+        const db = client.db("test");
+        const usersCollection = db.collection("users");
+        const recoveryTokensCollection = db.collection("recoveryTokens");
+
+        // Verificar si el email existe en la base de datos de usuarios
+        const user = await usersCollection.findOne({ email });
+        if (!user) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({ error: "El correo electrónico no está registrado." }),
+            };
+        }
 
         // Generar un token de recuperación
         const token = crypto.randomBytes(32).toString("hex");
@@ -44,30 +56,37 @@ exports.handler = async (event, context) => {
         await recoveryTokensCollection.insertOne({
             email,
             token,
-            expirationTime
+            expirationTime,
+            used: false, // Indicador para saber si el token ya fue utilizado
         });
 
         // Enviar el correo electrónico con el enlace de recuperación
         const resetPasswordLink = `https://web-chatonline.netlify.app/reset-password/${token}`;
+    
 
-        // Configurar las credenciales del cliente OAuth2
-        oAuth2Client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
-
-        // Crear el cuerpo del mensaje en formato raw
-        const rawMessage = makeBody(
-            email,
-            process.env.GMAIL_USERNAME,
-            'Recuperación de Contraseña',
-            `Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: ${resetPasswordLink}`
-        );
-
-        // Enviar el correo utilizando la API de Gmail
         const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+
+        const mailOptions = {
+            from: `Tu Nombre <${process.env.GMAIL_USERNAME}>`,
+            to: email,
+            subject: "Recuperación de Contraseña",
+            text: `Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: ${resetPasswordLink}`,
+            html: `<p>Hola, has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: <a href="${resetPasswordLink}">Restablecer Contraseña</a></p>`,
+        };
+
+        const encodedMessage = Buffer.from(
+            `Content-Type: text/html; charset=utf-8\r\n` +
+            `MIME-Version: 1.0\r\n` +
+            `Content-Transfer-Encoding: 7bit\r\n` +
+            `to: ${email}\r\n` +
+            `subject: ${mailOptions.subject}\r\n\r\n` +
+            `${mailOptions.html}`
+        ).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
         await gmail.users.messages.send({
             userId: 'me',
             requestBody: {
-                raw: rawMessage,
+                raw: encodedMessage,
             },
         });
 
@@ -87,16 +106,3 @@ exports.handler = async (event, context) => {
         await client.close();
     }
 };
-
-// Función para codificar el mensaje en base64
-function makeBody(to, from, subject, message) {
-    const str = [
-        `To: ${to}`,
-        `From: ${from}`,
-        `Subject: ${subject}`,
-        '',
-        message,
-    ].join('\n');
-
-    return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_');
-}
